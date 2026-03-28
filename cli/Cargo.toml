@@ -1,0 +1,8 @@
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_logic = { version = "0.1.0", path = "../core_logic" }
+serde_json = "1.0.149"

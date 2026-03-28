@@ -1,0 +1,8 @@
+[workspace]
+resolver = "3"
+members = [
+  "core_logic",
+  "cli",
+  "wasm_wrapper",
+  "android_ffi"
+]

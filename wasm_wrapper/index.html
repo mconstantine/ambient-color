@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ambient Color WASM</title>
+  </head>
+  <body>
+    <h1>Ambient Color Core</h1>
+    <div id="output">Loading WASM...</div>
+
+    <script type="module">
+      import init, { generate_color_web } from "./pkg/wasm_wrapper.js";
+
+      async function run() {
+        await init();
+
+        const result = generate_color_web();
+
+        document.getElementById("output").innerText = `Tracing bullet result: ${result.result}`;
+        console.log(`Rust says: ${JSON.stringify(result)}`);
+      }
+
+      void run();
+    </script>
+  </body>
+</html>
