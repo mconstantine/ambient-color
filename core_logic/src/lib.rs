@@ -1,21 +1,29 @@
-use serde::Serialize;
+use crate::{
+    data::WttrData,
+    network::{WttrError, fetch_wttr_data},
+};
 
-#[derive(Serialize)]
-pub struct ColorResult {
-    pub result: u32,
+pub mod data;
+mod network;
+
+pub enum ColorResult {
+    Ok(WttrData),
+    NetworkError,
+    ParseError,
 }
 
-pub fn generate_color() -> ColorResult {
-    ColorResult { result: 42 }
-}
+pub async fn generate_color() -> ColorResult {
+    match fetch_wttr_data().await {
+        Ok(data) => ColorResult::Ok(data),
+        Err(WttrError::NetworkError(error)) => {
+            println!("Network error: {}", error);
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+            ColorResult::NetworkError
+        }
+        Err(WttrError::ParseError(error)) => {
+            println!("Parse error: {}", error);
 
-    #[test]
-    fn it_works() {
-        let result = generate_color();
-        assert_eq!(result.result, 42);
+            ColorResult::ParseError
+        }
     }
 }

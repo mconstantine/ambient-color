@@ -1,10 +1,25 @@
-use core_logic::generate_color;
+use core_logic::{ColorResult, generate_color};
 
-fn main() {
-    let payload = generate_color();
-
-    match serde_json::to_string(&payload) {
-        Ok(json_string) => println!("{}", json_string),
-        Err(e) => println!("Error formatting JSON: {}", e),
+#[tokio::main]
+async fn main() {
+    match generate_color().await {
+        ColorResult::Ok(data) => match serde_json::to_string(&data) {
+            Ok(json_string) => {
+                println!("{}", json_string);
+                std::process::exit(0);
+            }
+            Err(error) => {
+                eprintln!("Error formatting JSON: {}", error);
+                std::process::exit(1);
+            }
+        },
+        ColorResult::NetworkError => {
+            eprintln!("Network error");
+            std::process::exit(1);
+        }
+        ColorResult::ParseError => {
+            eprintln!("Parse error");
+            std::process::exit(1);
+        }
     }
 }

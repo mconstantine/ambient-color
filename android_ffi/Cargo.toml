@@ -8,4 +8,5 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 core_logic = { path = "../core_logic" }
-uniffi = { version = "0.31.0", features = ["cli"] }
+uniffi = { version = "0.31.0", features = ["cli", "tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread"] }
