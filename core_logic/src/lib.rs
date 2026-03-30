@@ -3,6 +3,7 @@ use crate::{
     network::{WttrError, fetch_wttr_data},
 };
 
+mod color;
 pub mod data;
 mod network;
 
