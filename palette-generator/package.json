@@ -1,0 +1,16 @@
+{
+  "name": "palette-generator",
+  "version": "1.0.0",
+  "description": "Gets the palette from Tailwind CSS and turns it into a JSON file.",
+  "license": "ISC",
+  "author": "Mauro Constantinescu",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "effect": "^3.21.0",
+    "tailwindcss": "^4.2.2"
+  }
+}
