@@ -26,4 +26,4 @@ const parsed = decode(Object.fromEntries(
     .filter(([, value]) => typeof value === "object" && value !== null)
 ));
 
-fs.writeFileSync("./palette.json", JSON.stringify(parsed, null, 2), "utf-8");
+fs.writeFileSync("../core_logic/palette.json", JSON.stringify(parsed, null, 2), "utf-8");

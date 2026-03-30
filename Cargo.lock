@@ -277,6 +277,7 @@ dependencies = [
  "palette",
  "reqwest",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

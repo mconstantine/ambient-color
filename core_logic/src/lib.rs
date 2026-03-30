@@ -6,6 +6,7 @@ use crate::{
 mod color;
 pub mod data;
 mod network;
+mod theme;
 
 pub enum ColorResult {
     Ok(WttrData),
