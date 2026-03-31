@@ -13,6 +13,12 @@ enum TSColorResult {
 
     #[serde(rename = "ParseError")]
     ParseError,
+
+    #[serde(rename = "PaletteDataLoadingError")]
+    PaletteDataLoadingError,
+
+    #[serde(rename = "PaletteDataParseError")]
+    PaletteDataParseError,
 }
 
 #[wasm_bindgen]
@@ -23,6 +29,8 @@ pub async fn generate_color_web() -> Result<JsValue, JsValue> {
         ColorResult::Ok(data) => TSColorResult::Ok(data),
         ColorResult::NetworkError => TSColorResult::NetworkError,
         ColorResult::ParseError => TSColorResult::ParseError,
+        ColorResult::PaletteDataLoadingError => TSColorResult::PaletteDataLoadingError,
+        ColorResult::PaletteDataParseError => TSColorResult::PaletteDataParseError,
     };
 
     let js_value = serde_wasm_bindgen::to_value(&ts_result)?;

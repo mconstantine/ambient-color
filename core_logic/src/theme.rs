@@ -4,33 +4,51 @@ use palette::Oklch;
 
 type JsonColors = HashMap<String, HashMap<String, String>>;
 
-struct PaletteColorVariant<T = f32> {
+#[derive(Clone)]
+pub struct PaletteColorVariant<T = f32> {
     /**
      * Example: "red_500"
      */
-    name: String,
-    color: Oklch<T>,
+    pub name: String,
+    pub color: Oklch<T>,
 }
 
-struct PaletteColor {
+pub struct PaletteColor {
     /**
      * Example: red
      */
-    name: String,
-    variant_50: PaletteColorVariant,
-    variant_100: PaletteColorVariant,
-    variant_200: PaletteColorVariant,
-    variant_300: PaletteColorVariant,
-    variant_400: PaletteColorVariant,
-    variant_500: PaletteColorVariant,
-    variant_600: PaletteColorVariant,
-    variant_700: PaletteColorVariant,
-    variant_800: PaletteColorVariant,
-    variant_900: PaletteColorVariant,
-    variant_950: PaletteColorVariant,
+    pub name: String,
+    pub variant_50: PaletteColorVariant,
+    pub variant_100: PaletteColorVariant,
+    pub variant_200: PaletteColorVariant,
+    pub variant_300: PaletteColorVariant,
+    pub variant_400: PaletteColorVariant,
+    pub variant_500: PaletteColorVariant,
+    pub variant_600: PaletteColorVariant,
+    pub variant_700: PaletteColorVariant,
+    pub variant_800: PaletteColorVariant,
+    pub variant_900: PaletteColorVariant,
+    pub variant_950: PaletteColorVariant,
+}
+impl PaletteColor {
+    pub fn variants(&self) -> [&PaletteColorVariant; 11] {
+        [
+            &self.variant_50,
+            &self.variant_100,
+            &self.variant_200,
+            &self.variant_300,
+            &self.variant_400,
+            &self.variant_500,
+            &self.variant_600,
+            &self.variant_700,
+            &self.variant_800,
+            &self.variant_900,
+            &self.variant_950,
+        ]
+    }
 }
 
-fn load_palette<'a>(json_data: &str) -> Result<Vec<PaletteColor>, OklchExtractionError> {
+pub fn load_palette<'a>(json_data: &str) -> Result<Vec<PaletteColor>, OklchExtractionError> {
     let parsed: JsonColors = serde_json::from_str(json_data).expect("Invalid JSON data");
     let mut result: Vec<PaletteColor> = Vec::new();
 
@@ -69,14 +87,14 @@ fn load_palette<'a>(json_data: &str) -> Result<Vec<PaletteColor>, OklchExtractio
 }
 
 #[derive(Debug)]
-struct OklchExtrationErrorData {
-    hue: String,
-    weight: String,
-    received: String,
+pub struct OklchExtrationErrorData {
+    pub hue: String,
+    pub weight: String,
+    pub received: String,
 }
 
 #[derive(Debug)]
-enum OklchExtractionError {
+pub enum OklchExtractionError {
     MissingVariant { hue: String, weight: String },
     Prefix { data: OklchExtrationErrorData },
     Suffix { data: OklchExtrationErrorData },

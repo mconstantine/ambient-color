@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub struct Theme {
     #[serde(with = "color_hex")]
-    pub primary_color: Srgb<u8>,
+    pub background_color: Srgb<u8>,
 }
 
 mod color_hex {
