@@ -3,7 +3,7 @@ use core_logic::{ColorResult, generate_color};
 #[tokio::main]
 async fn main() {
     match generate_color().await {
-        ColorResult::Ok(data) => match serde_json::to_string(&data) {
+        ColorResult::Ok(theme) => match serde_json::to_string(&theme) {
             Ok(json_string) => {
                 println!("{}", json_string);
                 std::process::exit(0);

@@ -1,7 +1,7 @@
 use chrono::{NaiveTime, TimeDelta, Timelike};
 use palette::RgbHue;
 
-pub fn get_hue(day_of_year: u16) -> RgbHue {
+pub fn get_hue(day_of_year: u32) -> RgbHue {
     let day = day_of_year.clamp(1, 366) as f32;
     let ratio = (day - 1.0) / 365.0;
     let inverse_ratio = 1.0 - ratio;
@@ -12,8 +12,8 @@ pub fn get_hue(day_of_year: u16) -> RgbHue {
 
 #[derive(Debug, Copy, Clone)]
 pub struct DailyTemperature {
-    max: i8,
-    min: i8,
+    pub max: i8,
+    pub min: i8,
 }
 
 pub fn get_saturation(daily_temperature: DailyTemperature, current_temperature: i8) -> f32 {
@@ -25,8 +25,8 @@ pub fn get_saturation(daily_temperature: DailyTemperature, current_temperature: 
 
 #[derive(Debug, Copy, Clone)]
 pub struct SolarTimes {
-    sunrise: NaiveTime,
-    sunset: NaiveTime,
+    pub sunrise: NaiveTime,
+    pub sunset: NaiveTime,
 }
 
 pub fn get_lightness(solar_times: SolarTimes, now: NaiveTime) -> f32 {

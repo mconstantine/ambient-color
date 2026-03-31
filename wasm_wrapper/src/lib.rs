@@ -1,4 +1,4 @@
-use core_logic::{ColorResult, data::WttrData, generate_color};
+use core_logic::{ColorResult, data::Theme, generate_color};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 #[serde(tag = "status", content = "data")]
 enum TSColorResult {
     #[serde(rename = "Ok")]
-    Ok(WttrData),
+    Ok(Theme),
 
     #[serde(rename = "NetworkError")]
     NetworkError,
