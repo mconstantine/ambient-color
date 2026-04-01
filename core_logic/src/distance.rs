@@ -1,11 +1,17 @@
-use palette::{Hsv, IntoColor, Oklab, color_difference::EuclideanDistance};
+use palette::{
+    Hsv, IntoColor, Oklab, Srgb,
+    color_difference::{EuclideanDistance, Wcag21RelativeContrast},
+};
 
 use crate::theme::{PaletteColor, PaletteColorVariant};
 
-pub fn get_closest_palette_color(reference: &Hsv, palette: &[PaletteColor]) -> PaletteColorVariant {
+pub fn get_closest_palette_color(
+    reference: &Hsv,
+    palette: &[PaletteColor],
+) -> (PaletteColor, PaletteColorVariant) {
     let ref_oklab: Oklab = (*reference).into_color();
 
-    palette
+    let variant = palette
         .iter()
         .flat_map(|color| color.variants())
         .min_by(|a, b| {
@@ -17,5 +23,25 @@ pub fn get_closest_palette_color(reference: &Hsv, palette: &[PaletteColor]) -> P
             distance_a.partial_cmp(&distance_b).unwrap()
         })
         .cloned()
-        .expect("palette should not be empty")
+        .expect("palette should not be empty");
+
+    let color_name = *variant.name.split('_').collect::<Vec<_>>().get(0).unwrap();
+
+    let color = palette
+        .iter()
+        .find(|color| color.name == color_name)
+        .cloned()
+        .unwrap();
+
+    (color, variant)
+}
+
+pub fn get_foreground_color(background_color: Srgb<f32>, palette_color: PaletteColor) -> Srgb {
+    if background_color.relative_luminance().luma > 0.179 {
+        let dark: Srgb<f32> = palette_color.variant_950.color.into_color();
+        dark
+    } else {
+        let light: Srgb<f32> = palette_color.variant_50.color.into_color();
+        light
+    }
 }

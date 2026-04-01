@@ -3,10 +3,12 @@ use core_logic::{ColorResult, generate_color, palette::Srgb};
 
 #[derive(uniffi::Enum)]
 pub enum AndroidColorResult {
-    Ok { background_color: u32 },
+    Ok {
+        background_color: u32,
+        foreground_color: u32,
+    },
     NetworkError,
     ParseError,
-    PaletteDataLoadingError,
     PaletteDataParseError,
 }
 
@@ -33,10 +35,10 @@ pub fn generate_color_android() -> AndroidColorResult {
     match result {
         ColorResult::Ok(theme) => AndroidColorResult::Ok {
             background_color: theme.background_color.to_android_argb(),
+            foreground_color: theme.foreground_color.to_android_argb(),
         },
         ColorResult::NetworkError => AndroidColorResult::NetworkError,
         ColorResult::ParseError => AndroidColorResult::ParseError,
-        ColorResult::PaletteDataLoadingError => AndroidColorResult::PaletteDataLoadingError,
         ColorResult::PaletteDataParseError => AndroidColorResult::PaletteDataParseError,
     }
 }

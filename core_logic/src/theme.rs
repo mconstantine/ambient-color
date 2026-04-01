@@ -1,6 +1,7 @@
+use palette::Oklch;
 use std::collections::HashMap;
 
-use palette::Oklch;
+pub const PALETTE_JSON: &str = include_str!("palette.json");
 
 type JsonColors = HashMap<String, HashMap<String, String>>;
 
@@ -13,6 +14,7 @@ pub struct PaletteColorVariant<T = f32> {
     pub color: Oklch<T>,
 }
 
+#[derive(Clone)]
 pub struct PaletteColor {
     /**
      * Example: red
@@ -204,14 +206,10 @@ fn extract_oklch(hue: &str, weight: &str, value: &str) -> Result<Oklch, OklchExt
 
 #[cfg(test)]
 mod test_theme {
-    use crate::theme::load_palette;
-    use std::fs;
+    use crate::theme::{PALETTE_JSON, load_palette};
 
     #[test]
     fn test_load_palette() {
-        let file_path = "./palette.json";
-        let json_content = fs::read_to_string(file_path).expect("Unable to read JSON file");
-
-        load_palette(&json_content).unwrap();
+        load_palette(PALETTE_JSON).unwrap();
     }
 }

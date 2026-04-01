@@ -1,8 +1,21 @@
-use core_logic::{ColorResult, data::Theme, generate_color};
+use core_logic::{
+    ColorData, ColorResult, chrono::NaiveTime, compute_theme, data::Theme, generate_color,
+};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
+pub struct TSColorInput {
+    pub max_temperature: i8,
+    pub min_temperature: i8,
+    pub temperature: i8,
+    pub sunrise_time: String,
+    pub sunset_time: String,
+    pub day_of_year: u32,
+    pub now: String,
+}
+
+#[derive(Serialize)]
 #[serde(tag = "status", content = "data")]
 enum TSColorResult {
     #[serde(rename = "Ok")]
@@ -14,26 +27,68 @@ enum TSColorResult {
     #[serde(rename = "ParseError")]
     ParseError,
 
-    #[serde(rename = "PaletteDataLoadingError")]
-    PaletteDataLoadingError,
-
     #[serde(rename = "PaletteDataParseError")]
     PaletteDataParseError,
+
+    #[serde(rename = "InvalidInput")]
+    InvalidInput,
 }
 
 #[wasm_bindgen]
 pub async fn generate_color_web() -> Result<JsValue, JsValue> {
     let result = generate_color().await;
-
-    let ts_result = match result {
-        ColorResult::Ok(data) => TSColorResult::Ok(data),
-        ColorResult::NetworkError => TSColorResult::NetworkError,
-        ColorResult::ParseError => TSColorResult::ParseError,
-        ColorResult::PaletteDataLoadingError => TSColorResult::PaletteDataLoadingError,
-        ColorResult::PaletteDataParseError => TSColorResult::PaletteDataParseError,
-    };
-
+    let ts_result = parse_color_result(result);
     let js_value = serde_wasm_bindgen::to_value(&ts_result)?;
 
     Ok(js_value)
+}
+
+#[wasm_bindgen]
+pub fn compute_theme_web(input: JsValue) -> Result<JsValue, JsValue> {
+    let result: TSColorResult = match parse_and_compute(input) {
+        Ok(result) => result,
+        Err(result) => result,
+    };
+
+    let js_value = serde_wasm_bindgen::to_value(&result)?;
+
+    Ok(js_value)
+}
+
+fn parse_and_compute(input: JsValue) -> Result<TSColorResult, TSColorResult> {
+    let data: TSColorInput =
+        serde_wasm_bindgen::from_value(input).map_err(|_| TSColorResult::InvalidInput)?;
+
+    let sunrise_time = NaiveTime::parse_from_str(&data.sunrise_time, "%H:%M:%S")
+        .map_err(|_| TSColorResult::InvalidInput)?;
+
+    let sunset_time = NaiveTime::parse_from_str(&data.sunset_time, "%H:%M:%S")
+        .map_err(|_| TSColorResult::InvalidInput)?;
+
+    let now = NaiveTime::parse_from_str(&data.now, "%H:%M:%S")
+        .map_err(|_| TSColorResult::InvalidInput)?;
+
+    let color_data = ColorData {
+        max_temperature: data.max_temperature,
+        min_temperature: data.min_temperature,
+        temperature: data.temperature,
+        sunrise_time,
+        sunset_time,
+    };
+
+    let result = compute_theme(&color_data, data.day_of_year, now);
+
+    Ok(match result {
+        Ok(theme) => TSColorResult::Ok(theme),
+        Err(error) => parse_color_result(error),
+    })
+}
+
+fn parse_color_result(result: ColorResult) -> TSColorResult {
+    match result {
+        ColorResult::Ok(data) => TSColorResult::Ok(data),
+        ColorResult::NetworkError => TSColorResult::NetworkError,
+        ColorResult::ParseError => TSColorResult::ParseError,
+        ColorResult::PaletteDataParseError => TSColorResult::PaletteDataParseError,
+    }
 }

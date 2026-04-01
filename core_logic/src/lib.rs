@@ -1,17 +1,16 @@
-use std::{fs, io::Error};
-
-use chrono::{Datelike, Local};
+use chrono::{Datelike, Local, NaiveTime};
 use palette::{Hsv, IntoColor, Srgb};
 
 use crate::{
     color::{DailyTemperature, SolarTimes, get_hue, get_lightness, get_saturation},
     data::Theme,
-    distance::get_closest_palette_color,
+    distance::{get_closest_palette_color, get_foreground_color},
     network::fetch_wttr_data,
     parse::{WttrParseError, parse_wttr_data},
-    theme::{OklchExtractionError, load_palette},
+    theme::{OklchExtractionError, PALETTE_JSON, load_palette},
 };
 
+pub use chrono;
 pub use palette;
 
 mod color;
@@ -21,11 +20,18 @@ mod network;
 mod parse;
 mod theme;
 
+pub struct ColorData {
+    pub max_temperature: i8,
+    pub min_temperature: i8,
+    pub temperature: i8,
+    pub sunrise_time: NaiveTime,
+    pub sunset_time: NaiveTime,
+}
+
 pub enum ColorResult {
     Ok(Theme),
     NetworkError,
     ParseError,
-    PaletteDataLoadingError,
     PaletteDataParseError,
 }
 
@@ -56,12 +62,6 @@ impl From<WttrParseError> for ColorResult {
         }
 
         ColorResult::ParseError
-    }
-}
-
-impl From<Error> for ColorResult {
-    fn from(_: Error) -> Self {
-        ColorResult::PaletteDataLoadingError
     }
 }
 
@@ -118,34 +118,8 @@ pub async fn generate_color() -> ColorResult {
         let response = fetch_wttr_data().await?;
         let data = parse_wttr_data(&response)?;
         let now = Local::now();
-        let hue = get_hue(now.ordinal());
 
-        let saturation = get_saturation(
-            DailyTemperature {
-                max: data.max_temperature,
-                min: data.min_temperature,
-            },
-            data.temperature,
-        );
-
-        let lightness = get_lightness(
-            SolarTimes {
-                sunrise: data.sunrise_time,
-                sunset: data.sunset_time,
-            },
-            now.time(),
-        );
-
-        let generated_color = Hsv::new(hue, saturation, lightness);
-
-        let palette_data = fs::read_to_string("./palette.json")?;
-        let palette = load_palette(&palette_data)?;
-
-        let closest_color_oklch = get_closest_palette_color(&generated_color, &palette);
-        let closest_color_rgb: Srgb<f32> = closest_color_oklch.color.into_color();
-        let background_color: Srgb<u8> = closest_color_rgb.into_format();
-
-        Ok(Theme { background_color })
+        compute_theme(&data, now.ordinal(), now.time())
     }
     .await;
 
@@ -153,4 +127,46 @@ pub async fn generate_color() -> ColorResult {
         Ok(theme) => ColorResult::Ok(theme),
         Err(error) => error,
     }
+}
+
+pub fn compute_theme(
+    data: &ColorData,
+    day_of_year: u32,
+    time_of_day: NaiveTime,
+) -> Result<Theme, ColorResult> {
+    let hue = get_hue(day_of_year);
+
+    let saturation = get_saturation(
+        DailyTemperature {
+            max: data.max_temperature,
+            min: data.min_temperature,
+        },
+        data.temperature,
+    );
+
+    let lightness = get_lightness(
+        SolarTimes {
+            sunrise: data.sunrise_time,
+            sunset: data.sunset_time,
+        },
+        time_of_day,
+    );
+
+    let generated_color = Hsv::new(hue, saturation, lightness);
+
+    let palette = load_palette(PALETTE_JSON)?;
+
+    let (closest_color, closest_variant_oklch) =
+        get_closest_palette_color(&generated_color, &palette);
+
+    let background_color_rgb: Srgb<f32> = closest_variant_oklch.color.into_color();
+
+    let foreground_color_rgb = get_foreground_color(background_color_rgb, closest_color);
+    let background_color: Srgb<u8> = background_color_rgb.into_format();
+    let foreground_color: Srgb<u8> = foreground_color_rgb.into_format();
+
+    Ok(Theme {
+        background_color,
+        foreground_color,
+    })
 }

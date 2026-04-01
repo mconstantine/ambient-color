@@ -1,6 +1,8 @@
 use chrono::NaiveTime;
 use serde::Deserialize;
 
+use crate::ColorData;
+
 #[derive(Debug)]
 pub enum WttrParseError {
     MissingCurrentCondition,
@@ -36,14 +38,6 @@ struct WttrResponse {
     current_condition: Vec<CurrentCondition>,
     #[serde(rename = "weather")]
     daily_weather: Vec<DailyWeather>,
-}
-
-pub struct ColorData {
-    pub max_temperature: i8,
-    pub min_temperature: i8,
-    pub temperature: i8,
-    pub sunrise_time: NaiveTime,
-    pub sunset_time: NaiveTime,
 }
 
 pub fn parse_wttr_data(data: &str) -> Result<ColorData, WttrParseError> {
