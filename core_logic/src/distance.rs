@@ -3,7 +3,10 @@ use palette::{
     color_difference::{EuclideanDistance, Wcag21RelativeContrast},
 };
 
-use crate::theme::{PaletteColor, PaletteColorVariant};
+use crate::{
+    data::ForegroundType,
+    theme::{PaletteColor, PaletteColorVariant},
+};
 
 pub fn get_closest_palette_color(
     reference: &Hsv,
@@ -37,11 +40,24 @@ pub fn get_closest_palette_color(
 }
 
 pub fn get_foreground_color(background_color: Srgb<f32>, palette_color: PaletteColor) -> Srgb {
+    let foreground_type = get_foreground_type(background_color);
+
+    match foreground_type {
+        ForegroundType::Dark => {
+            let dark: Srgb<f32> = palette_color.variant_950.color.into_color();
+            dark
+        }
+        ForegroundType::Light => {
+            let light: Srgb<f32> = palette_color.variant_50.color.into_color();
+            light
+        }
+    }
+}
+
+pub fn get_foreground_type(background_color: Srgb<f32>) -> ForegroundType {
     if background_color.relative_luminance().luma > 0.179 {
-        let dark: Srgb<f32> = palette_color.variant_950.color.into_color();
-        dark
+        ForegroundType::Dark
     } else {
-        let light: Srgb<f32> = palette_color.variant_50.color.into_color();
-        light
+        ForegroundType::Light
     }
 }

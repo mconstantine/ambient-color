@@ -1,5 +1,5 @@
 uniffi::setup_scaffolding!();
-use core_logic::{ColorResult, generate_color, palette::Srgb};
+use core_logic::{ColorResult, generate_theme, palette::Srgb};
 
 #[derive(uniffi::Enum)]
 pub enum AndroidColorResult {
@@ -28,9 +28,9 @@ impl IntoAndroidColor for Srgb<u8> {
 }
 
 #[uniffi::export]
-pub fn generate_color_android() -> AndroidColorResult {
+pub fn generate_theme_android() -> AndroidColorResult {
     let rt = tokio::runtime::Runtime::new().unwrap();
-    let result = rt.block_on(generate_color());
+    let result = rt.block_on(generate_theme());
 
     match result {
         ColorResult::Ok(theme) => AndroidColorResult::Ok {

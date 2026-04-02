@@ -1,20 +1,24 @@
+use crate::data::oklch_hex;
 use palette::Oklch;
+use serde::Serialize;
 use std::collections::HashMap;
 
 pub const PALETTE_JSON: &str = include_str!("palette.json");
 
 type JsonColors = HashMap<String, HashMap<String, String>>;
 
-#[derive(Clone)]
-pub struct PaletteColorVariant<T = f32> {
+#[derive(Clone, Serialize)]
+pub struct PaletteColorVariant {
     /**
      * Example: "red_500"
      */
     pub name: String,
-    pub color: Oklch<T>,
+
+    #[serde(with = "oklch_hex")]
+    pub color: Oklch<f32>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct PaletteColor {
     /**
      * Example: red

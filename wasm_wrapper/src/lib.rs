@@ -1,5 +1,5 @@
 use core_logic::{
-    ColorData, ColorResult, chrono::NaiveTime, compute_theme, data::Theme, generate_color,
+    ColorData, ColorResult, chrono::NaiveTime, compute_theme, data::Theme, generate_theme,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -35,8 +35,8 @@ enum TSColorResult {
 }
 
 #[wasm_bindgen]
-pub async fn generate_color_web() -> Result<JsValue, JsValue> {
-    let result = generate_color().await;
+pub async fn generate_theme_web() -> Result<JsValue, JsValue> {
+    let result = generate_theme().await;
     let ts_result = parse_color_result(result);
     let js_value = serde_wasm_bindgen::to_value(&ts_result)?;
 
@@ -84,7 +84,7 @@ fn parse_and_compute(input: JsValue) -> Result<TSColorResult, TSColorResult> {
     })
 }
 
-fn parse_color_result(result: ColorResult) -> TSColorResult {
+fn parse_color_result(result: ColorResult<Theme>) -> TSColorResult {
     match result {
         ColorResult::Ok(data) => TSColorResult::Ok(data),
         ColorResult::NetworkError => TSColorResult::NetworkError,

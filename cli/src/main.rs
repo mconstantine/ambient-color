@@ -1,8 +1,8 @@
-use core_logic::{ColorResult, generate_color};
+use core_logic::{ColorResult, generate_theme};
 
 #[tokio::main]
 async fn main() {
-    match generate_color().await {
+    match generate_theme().await {
         ColorResult::Ok(theme) => match serde_json::to_string(&theme) {
             Ok(json_string) => {
                 println!("{}", json_string);
