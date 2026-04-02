@@ -18,7 +18,7 @@ pub mod data;
 mod distance;
 mod network;
 mod parse;
-mod theme;
+pub mod theme;
 
 pub struct ColorData {
     pub max_temperature: i8,

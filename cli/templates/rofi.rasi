@@ -1,0 +1,7 @@
+* {
+    bg: #040939;
+    bg-950: #162455;
+    fg: #bddafe;
+    primary: #ffc91d;
+    primary-content: #793205;
+}

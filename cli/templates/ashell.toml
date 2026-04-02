@@ -1,0 +1,30 @@
+log_level = "off"
+enable_esc_key = true
+
+[modules]
+left = ["SystemInfo", "Updates"]
+center = ["Workspaces", "WindowTitle"]
+right = ["Clock", "Settings"]
+
+[updates]
+check_cmd = "checkupdates; yay -Qua"
+update_cmd = 'foot -e bash -c "yay; echo Done - Press enter to exit; read" &'
+
+[appearance]
+font_name = "NotoSansM Nerd Font Mono"
+succes_color = "#01df72"
+text_color = "#bddafe"
+
+[appearance.primary_color]
+base = "#ffc91d"
+text = "#793205"
+
+[appearance.danger_color]
+base = "#ff6266"
+text = "#440607"
+
+[appearance.background_color]
+base = "#162455"
+
+[appearance.secondary_color]
+base = "#1a368b"
