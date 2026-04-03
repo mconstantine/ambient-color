@@ -46,6 +46,7 @@ fn compile_config_files(theme: ThemeExtended) -> () {
     digest_template(&context, &mut env, "hyprlock", "hyprlock.conf");
     digest_template(&context, &mut env, "rofi", "rofi.rasi");
     digest_template(&context, &mut env, "tmux", "tmux.conf");
+    digest_template(&context, &mut env, "zsh", ".zshrc");
 }
 
 fn digest_template(
