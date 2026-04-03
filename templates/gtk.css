@@ -1,0 +1,32 @@
+/* The Accent Color (Checkboxes, Switches, Selections) */
+@define-color accent_color {{ primary_500 }};
+@define-color accent_bg_color {{ primary_500 }};
+@define-color accent_fg_color {{ primary_500_foreground }};
+
+/* Main Window Background & Text */
+@define-color window_bg_color {{ primary_950 }};
+@define-color window_fg_color {{ primary_50 }};
+
+/* Text Inputs and Content Views */
+@define-color view_bg_color {{ neutral_950 }};
+@define-color view_fg_color {{ neutral_50 }};
+
+/* Header Bars (Title bars of windows) */
+@define-color headerbar_bg_color {{ primary_500 }};
+@define-color headerbar_fg_color {{ primary_500_foreground }};
+
+/* Popovers (Right-click menus, Dropdowns) */
+@define-color popover_bg_color {{ primary_950 }};
+@define-color popover_fg_color {{ primary_50 }};
+
+/* Dialogs (File Pickers, Warnings) */
+@define-color dialog_bg_color {{ primary_950 }};
+@define-color dialog_fg_color {{ primary_50 }};
+
+/* Legacy GTK3 Fallback Variables */
+@define-color theme_bg_color @window_bg_color;
+@define-color theme_fg_color @window_fg_color;
+@define-color theme_base_color @view_bg_color;
+@define-color theme_text_color @view_fg_color;
+@define-color theme_selected_bg_color @accent_bg_color;
+@define-color theme_selected_fg_color @accent_fg_color;

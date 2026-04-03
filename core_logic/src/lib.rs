@@ -174,26 +174,96 @@ pub fn compute_theme_extended(
     time_of_day: NaiveTime,
 ) -> Result<ThemeExtended, ColorResult<ThemeExtended>> {
     let generated_color = generate_color(data, day_of_year, time_of_day)?;
+    let opposite_color = generated_color.shift_hue(180.0);
     let secondary_color = generated_color.shift_hue(120.0);
     let tertiary_color = generated_color.shift_hue(240.0);
 
     let palette = load_palette(PALETTE_JSON)?;
 
-    let (primary_palette, _) = get_closest_palette_color(&generated_color, &palette);
-    let (secondary_palette, _) = get_closest_palette_color(&secondary_color, &palette);
-    let (tertiary_palette, _) = get_closest_palette_color(&tertiary_color, &palette);
+    let (primary_palette, primary_variant) = get_closest_palette_color(&generated_color, &palette);
+    let (opposite_palette, opposite_variant) = get_closest_palette_color(&opposite_color, &palette);
+
+    let (secondary_palette, secondary_variant) =
+        get_closest_palette_color(&secondary_color, &palette);
+
+    let (tertiary_palette, tertiary_variant) = get_closest_palette_color(&tertiary_color, &palette);
+
+    let neutral_palette = palette
+        .iter()
+        .find(|c| c.name == "neutral")
+        .cloned()
+        .unwrap();
+
+    let primary_500 = primary_palette
+        .variants()
+        .iter()
+        .find(|v| v.name == format!("{}_500", primary_palette.name))
+        .cloned()
+        .unwrap();
+
+    let opposite_500 = opposite_palette
+        .variants()
+        .iter()
+        .find(|v| v.name == format!("{}_500", opposite_palette.name))
+        .cloned()
+        .unwrap();
+
+    let secondary_500 = secondary_palette
+        .variants()
+        .iter()
+        .find(|v| v.name == format!("{}_500", secondary_palette.name))
+        .cloned()
+        .unwrap();
+
+    let tertiary_500 = tertiary_palette
+        .variants()
+        .iter()
+        .find(|v| v.name == format!("{}_500", tertiary_palette.name))
+        .cloned()
+        .unwrap();
 
     let original_color_rgb: Srgb<f32> = generated_color.into_color();
-    let original_color: Srgb<u8> = original_color_rgb.into_format();
+    let primary_color_rgb: Srgb<f32> = primary_variant.color.into_color();
+    let primary_500_rgb: Srgb<f32> = primary_500.color.into_color();
+    let opposite_color_rgb: Srgb<f32> = opposite_variant.color.into_color();
+    let opposite_500_rgb: Srgb<f32> = opposite_500.color.into_color();
+    let secondary_color_rgb: Srgb<f32> = secondary_variant.color.into_color();
+    let secondary_500_rgb: Srgb<f32> = secondary_500.color.into_color();
+    let tertiary_color_rgb: Srgb<f32> = tertiary_variant.color.into_color();
+    let tertiary_500_rgb: Srgb<f32> = tertiary_500.color.into_color();
 
-    let foreground_type = get_foreground_type(original_color_rgb);
+    let original_color: Srgb<u8> = original_color_rgb.into_format();
+    let original_foreground_type = get_foreground_type(opposite_color_rgb);
+
+    let primary_foreground_type = get_foreground_type(primary_color_rgb);
+    let primary_500_foreground_type = get_foreground_type(primary_500_rgb);
+    let opposite_foreground_type = get_foreground_type(opposite_color_rgb);
+    let opposite_500_foreground_type = get_foreground_type(opposite_500_rgb);
+    let secondary_foreground_type = get_foreground_type(secondary_color_rgb);
+    let secondary_500_foreground_type = get_foreground_type(secondary_500_rgb);
+    let tertiary_foreground_type = get_foreground_type(tertiary_color_rgb);
+    let tertiary_500_foreground_type = get_foreground_type(tertiary_500_rgb);
 
     Ok(ThemeExtended {
         original_color,
+        original_foreground_type,
+        primary_variant,
         primary_palette,
+        primary_foreground_type,
+        primary_500_foreground_type,
+        opposite_variant,
+        opposite_palette,
+        opposite_foreground_type,
+        opposite_500_foreground_type,
+        secondary_variant,
         secondary_palette,
+        secondary_foreground_type,
+        secondary_500_foreground_type,
+        tertiary_variant,
         tertiary_palette,
-        foreground_type,
+        tertiary_foreground_type,
+        tertiary_500_foreground_type,
+        neutral_palette,
     })
 }
 

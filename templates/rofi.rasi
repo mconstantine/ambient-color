@@ -1,0 +1,7 @@
+* {
+    bg: {{ primary_800 }};
+    bg-950: {{ primary_950 }};
+    fg: {{ primary_50 }};
+    primary: {{ primary_500 }};
+    primary-content: {{ primary_500_foreground }};
+}

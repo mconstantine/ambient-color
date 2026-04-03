@@ -1,7 +1,7 @@
 use palette::Srgb;
 use serde::{Deserialize, Serialize};
 
-use crate::theme::PaletteColor;
+use crate::theme::{PaletteColor, PaletteColorVariant};
 
 #[derive(Serialize)]
 pub enum ForegroundType {
@@ -22,10 +22,24 @@ pub struct Theme {
 pub struct ThemeExtended {
     #[serde(with = "srgb_hex")]
     pub original_color: Srgb<u8>,
+    pub original_foreground_type: ForegroundType,
+    pub primary_variant: PaletteColorVariant,
+    pub primary_500_foreground_type: ForegroundType,
+    pub primary_foreground_type: ForegroundType,
     pub primary_palette: PaletteColor,
+    pub opposite_variant: PaletteColorVariant,
+    pub opposite_foreground_type: ForegroundType,
+    pub opposite_500_foreground_type: ForegroundType,
+    pub opposite_palette: PaletteColor,
+    pub secondary_variant: PaletteColorVariant,
+    pub secondary_foreground_type: ForegroundType,
+    pub secondary_500_foreground_type: ForegroundType,
     pub secondary_palette: PaletteColor,
+    pub tertiary_variant: PaletteColorVariant,
+    pub tertiary_foreground_type: ForegroundType,
+    pub tertiary_500_foreground_type: ForegroundType,
     pub tertiary_palette: PaletteColor,
-    pub foreground_type: ForegroundType,
+    pub neutral_palette: PaletteColor,
 }
 
 pub mod srgb_hex {

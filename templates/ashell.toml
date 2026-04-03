@@ -12,19 +12,24 @@ update_cmd = 'foot -e bash -c "yay; echo Done - Press enter to exit; read" &'
 
 [appearance]
 font_name = "NotoSansM Nerd Font Mono"
-succes_color = "#01df72"
-text_color = "#bddafe"
+text_color = "{{ primary_50 }}"
+
+[appearance.success_color]
+base = "#05df72"
+text = "#032e15"
 
 [appearance.primary_color]
-base = "#ffc91d"
-text = "#793205"
+base = "{{ opposite_400 }}"
+text = "{{ opposite_500_foreground }}"
 
 [appearance.danger_color]
 base = "#ff6266"
 text = "#440607"
 
 [appearance.background_color]
-base = "#162455"
+base = "{{ primary_900 }}"
+text = "{{ primary_50 }}"
 
 [appearance.secondary_color]
-base = "#1a368b"
+base = "{{ secondary_400 }}"
+text = "{{ secondary_500_foreground }}"

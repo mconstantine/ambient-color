@@ -68,6 +68,6 @@ cargo ndk -t arm64-v8a -o ./jniLibs build --release --package android_ffi
 Copy the `jniLibs` directory and `android_ffi.kt` file into your Android Studio project:
 
 ```bash
-cp -r ./jniLibs ~/AndroidStudioProjects/AmbientColor/wear/src/main
-cp -r ./android_src/uniffi/android_ffi/android_ffi.kt ~/AndroidStudioProjects/AmbientColor/wear/src/main/java/it/mconst/ambientcolor/presentation
+cp -r ./jniLibs ./android_ffi/AmbientColor/wear/src/main
+cp -r ./android_src/uniffi/android_ffi/android_ffi.kt ./android_ffi/AmbientColor/wear/src/main/java/it/mconst/ambientcolor/presentation
 ```
