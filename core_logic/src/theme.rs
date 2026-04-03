@@ -1,5 +1,5 @@
 use crate::data::oklch_hex;
-use palette::Oklch;
+use palette::{IntoColor, Oklch, Srgb, color_difference::Wcag21RelativeContrast};
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -15,7 +15,10 @@ pub struct PaletteColorVariant {
     pub name: String,
 
     #[serde(with = "oklch_hex")]
-    pub color: Oklch<f32>,
+    pub bg: Oklch<f32>,
+
+    #[serde(with = "oklch_hex")]
+    pub fg: Oklch<f32>,
 }
 
 #[derive(Clone, Serialize)]
@@ -24,32 +27,23 @@ pub struct PaletteColor {
      * Example: red
      */
     pub name: String,
-    pub variant_50: PaletteColorVariant,
-    pub variant_100: PaletteColorVariant,
-    pub variant_200: PaletteColorVariant,
-    pub variant_300: PaletteColorVariant,
-    pub variant_400: PaletteColorVariant,
-    pub variant_500: PaletteColorVariant,
-    pub variant_600: PaletteColorVariant,
-    pub variant_700: PaletteColorVariant,
-    pub variant_800: PaletteColorVariant,
-    pub variant_900: PaletteColorVariant,
-    pub variant_950: PaletteColorVariant,
+    pub w50: PaletteColorVariant,
+    pub w100: PaletteColorVariant,
+    pub w200: PaletteColorVariant,
+    pub w300: PaletteColorVariant,
+    pub w400: PaletteColorVariant,
+    pub w500: PaletteColorVariant,
+    pub w600: PaletteColorVariant,
+    pub w700: PaletteColorVariant,
+    pub w800: PaletteColorVariant,
+    pub w900: PaletteColorVariant,
+    pub w950: PaletteColorVariant,
 }
 impl PaletteColor {
     pub fn variants(&self) -> [&PaletteColorVariant; 11] {
         [
-            &self.variant_50,
-            &self.variant_100,
-            &self.variant_200,
-            &self.variant_300,
-            &self.variant_400,
-            &self.variant_500,
-            &self.variant_600,
-            &self.variant_700,
-            &self.variant_800,
-            &self.variant_900,
-            &self.variant_950,
+            &self.w50, &self.w100, &self.w200, &self.w300, &self.w400, &self.w500, &self.w600,
+            &self.w700, &self.w800, &self.w900, &self.w950,
         ]
     }
 }
@@ -59,31 +53,31 @@ pub fn load_palette<'a>(json_data: &str) -> Result<Vec<PaletteColor>, OklchExtra
     let mut result: Vec<PaletteColor> = Vec::new();
 
     for (hue, variants) in parsed {
-        let variant_50 = extract_json_variant(&variants, &hue, "50")?;
-        let variant_100 = extract_json_variant(&variants, &hue, "100")?;
-        let variant_200 = extract_json_variant(&variants, &hue, "200")?;
-        let variant_300 = extract_json_variant(&variants, &hue, "300")?;
-        let variant_400 = extract_json_variant(&variants, &hue, "400")?;
-        let variant_500 = extract_json_variant(&variants, &hue, "500")?;
-        let variant_600 = extract_json_variant(&variants, &hue, "600")?;
-        let variant_700 = extract_json_variant(&variants, &hue, "700")?;
-        let variant_800 = extract_json_variant(&variants, &hue, "800")?;
-        let variant_900 = extract_json_variant(&variants, &hue, "900")?;
-        let variant_950 = extract_json_variant(&variants, &hue, "950")?;
+        let w50 = extract_json_variant(&variants, &hue, "50")?;
+        let w100 = extract_json_variant(&variants, &hue, "100")?;
+        let w200 = extract_json_variant(&variants, &hue, "200")?;
+        let w300 = extract_json_variant(&variants, &hue, "300")?;
+        let w400 = extract_json_variant(&variants, &hue, "400")?;
+        let w500 = extract_json_variant(&variants, &hue, "500")?;
+        let w600 = extract_json_variant(&variants, &hue, "600")?;
+        let w700 = extract_json_variant(&variants, &hue, "700")?;
+        let w800 = extract_json_variant(&variants, &hue, "800")?;
+        let w900 = extract_json_variant(&variants, &hue, "900")?;
+        let w950 = extract_json_variant(&variants, &hue, "950")?;
 
         let color = PaletteColor {
             name: hue.clone(),
-            variant_50,
-            variant_100,
-            variant_200,
-            variant_300,
-            variant_400,
-            variant_500,
-            variant_600,
-            variant_700,
-            variant_800,
-            variant_900,
-            variant_950,
+            w50,
+            w100,
+            w200,
+            w300,
+            w400,
+            w500,
+            w600,
+            w700,
+            w800,
+            w900,
+            w950,
         };
 
         result.push(color);
@@ -122,11 +116,35 @@ fn extract_json_variant(
             weight: String::from(weight),
         })?;
 
-    let color = extract_oklch(hue, weight, variant)?;
+    let lightest_variant = variants
+        .get("50")
+        .ok_or(OklchExtractionError::MissingVariant {
+            hue: String::from(hue),
+            weight: String::from(weight),
+        })?;
+
+    let darkest_variant = variants
+        .get("950")
+        .ok_or(OklchExtractionError::MissingVariant {
+            hue: String::from(hue),
+            weight: String::from(weight),
+        })?;
+
+    let bg = extract_oklch(hue, weight, variant)?;
+    let dark = extract_oklch(hue, "50", darkest_variant)?;
+    let light = extract_oklch(hue, "50", lightest_variant)?;
+    let color_rgb: Srgb<f32> = bg.into_color();
+
+    let fg = if color_rgb.relative_luminance().luma > 0.179 {
+        dark
+    } else {
+        light
+    };
 
     Ok(PaletteColorVariant {
         name: format!("{}_{}", hue, weight),
-        color,
+        bg,
+        fg,
     })
 }
 

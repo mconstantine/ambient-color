@@ -18,8 +18,8 @@ pub fn get_closest_palette_color(
         .iter()
         .flat_map(|color| color.variants())
         .min_by(|a, b| {
-            let a_oklab: Oklab = a.color.into_color();
-            let b_oklab: Oklab = b.color.into_color();
+            let a_oklab: Oklab = a.bg.into_color();
+            let b_oklab: Oklab = b.bg.into_color();
             let distance_a = a_oklab.distance(ref_oklab);
             let distance_b = b_oklab.distance(ref_oklab);
 
@@ -44,11 +44,11 @@ pub fn get_foreground_color(background_color: Srgb<f32>, palette_color: PaletteC
 
     match foreground_type {
         ForegroundType::Dark => {
-            let dark: Srgb<f32> = palette_color.variant_950.color.into_color();
+            let dark: Srgb<f32> = palette_color.w950.bg.into_color();
             dark
         }
         ForegroundType::Light => {
-            let light: Srgb<f32> = palette_color.variant_50.color.into_color();
+            let light: Srgb<f32> = palette_color.w50.bg.into_color();
             light
         }
     }

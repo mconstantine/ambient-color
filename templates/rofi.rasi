@@ -1,7 +1,7 @@
 * {
-    bg: {{ primary_800 }};
-    bg-950: {{ primary_950 }};
-    fg: {{ primary_50 }};
-    primary: {{ primary_500 }};
-    primary-content: {{ primary_500_foreground }};
+    bg: {{ primary.w800.bg }};
+    bg-950: {{ primary.w950.bg }};
+    fg: {{ primary.w800.fg }};
+    primary: {{ primary.w500.bg }};
+    primary-content: {{ primary.w500.fg }};
 }

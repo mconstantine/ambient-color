@@ -1,27 +1,27 @@
 /* The Accent Color (Checkboxes, Switches, Selections) */
-@define-color accent_color {{ primary_500 }};
-@define-color accent_bg_color {{ primary_500 }};
-@define-color accent_fg_color {{ primary_500_foreground }};
+@define-color accent_color {{ opposite.w500.bg }};
+@define-color accent_bg_color {{ opposite.w950.bg }};
+@define-color accent_fg_color {{ opposite.w950.fg }};
 
 /* Main Window Background & Text */
-@define-color window_bg_color {{ primary_950 }};
-@define-color window_fg_color {{ primary_50 }};
+@define-color window_bg_color {{ primary.w950.bg }};
+@define-color window_fg_color {{ primary.w950.fg }};
 
 /* Text Inputs and Content Views */
-@define-color view_bg_color {{ neutral_950 }};
-@define-color view_fg_color {{ neutral_50 }};
+@define-color view_bg_color {{ neutral.w950.bg }};
+@define-color view_fg_color {{ neutral.w950.fg }};
 
 /* Header Bars (Title bars of windows) */
-@define-color headerbar_bg_color {{ primary_500 }};
-@define-color headerbar_fg_color {{ primary_500_foreground }};
+@define-color headerbar_bg_color {{ primary.w500.fg }};
+@define-color headerbar_fg_color {{ primary.w500.bg }};
 
 /* Popovers (Right-click menus, Dropdowns) */
-@define-color popover_bg_color {{ primary_950 }};
-@define-color popover_fg_color {{ primary_50 }};
+@define-color popover_bg_color {{ primary.w950.bg }};
+@define-color popover_fg_color {{ primary.w950.fg }};
 
 /* Dialogs (File Pickers, Warnings) */
-@define-color dialog_bg_color {{ primary_950 }};
-@define-color dialog_fg_color {{ primary_50 }};
+@define-color dialog_bg_color {{ primary.w950.bg }};
+@define-color dialog_fg_color {{ primary.w950.fg }};
 
 /* Legacy GTK3 Fallback Variables */
 @define-color theme_bg_color @window_bg_color;
