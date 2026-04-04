@@ -1,5 +1,15 @@
+use chrono::NaiveTime;
 use palette::Oklch;
 use serde::Serialize;
+
+#[derive(Serialize, Clone)]
+pub struct WeatherData {
+    pub max_temperature: i8,
+    pub min_temperature: i8,
+    pub temperature: i8,
+    pub sunrise_time: NaiveTime,
+    pub sunset_time: NaiveTime,
+}
 
 #[derive(Clone, Serialize)]
 pub struct PaletteColorVariant {
@@ -41,6 +51,7 @@ pub enum ForegroundType {
 
 #[derive(Serialize)]
 pub struct Theme {
+    pub weather_data: WeatherData,
     pub original_color: PaletteColorVariant,
     pub primary_palette: PaletteColor,
     pub opposite_palette: PaletteColor,

@@ -3,7 +3,7 @@ use palette::{Hsl, IntoColor, Oklch, ShiftHue};
 
 use crate::{
     color::{DailyTemperature, SolarTimes, get_hue, get_lightness, get_saturation},
-    data::{PaletteColorVariant, Theme},
+    data::{PaletteColorVariant, Theme, WeatherData},
     network::fetch_wttr_data,
     parse::{WttrParseError, parse_wttr_data},
     theme::{generate_palette, generate_palette_with_base_chroma, get_foreground_color},
@@ -18,19 +18,10 @@ mod network;
 mod parse;
 mod theme;
 
-pub struct ColorData {
-    pub max_temperature: i8,
-    pub min_temperature: i8,
-    pub temperature: i8,
-    pub sunrise_time: NaiveTime,
-    pub sunset_time: NaiveTime,
-}
-
 pub enum ColorResult {
     Ok(Theme),
     NetworkError,
     ParseError,
-    PaletteDataParseError,
 }
 
 impl From<reqwest::Error> for ColorResult {
@@ -64,7 +55,7 @@ impl From<WttrParseError> for ColorResult {
 }
 
 pub async fn generate_theme() -> ColorResult {
-    let data: Result<ColorData, ColorResult> = async {
+    let data: Result<WeatherData, ColorResult> = async {
         let response = fetch_wttr_data().await?;
 
         Ok(parse_wttr_data(&response)?)
@@ -82,7 +73,7 @@ pub async fn generate_theme() -> ColorResult {
     }
 }
 
-pub fn compute_theme(data: &ColorData, day_of_year: u32, time_of_day: NaiveTime) -> Theme {
+pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTime) -> Theme {
     let original_color_hsv = generate_color(data, day_of_year, time_of_day);
     let original_color: Oklch = original_color_hsv.into_color();
     let opposite_color = original_color_hsv.shift_hue(180.0);
@@ -104,6 +95,7 @@ pub fn compute_theme(data: &ColorData, day_of_year: u32, time_of_day: NaiveTime)
     );
 
     Theme {
+        weather_data: (*data).clone(),
         original_color: PaletteColorVariant {
             bg: original_color,
             fg: original_color_foreground,
@@ -116,7 +108,7 @@ pub fn compute_theme(data: &ColorData, day_of_year: u32, time_of_day: NaiveTime)
     }
 }
 
-fn generate_color(data: &ColorData, day_of_year: u32, time_of_day: NaiveTime) -> Hsl {
+fn generate_color(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTime) -> Hsl {
     let hue = get_hue(day_of_year);
 
     let saturation = get_saturation(

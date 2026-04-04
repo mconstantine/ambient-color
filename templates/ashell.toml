@@ -27,9 +27,9 @@ base = "#ff6266"
 text = "#440607"
 
 [appearance.background_color]
-base = "{{ primary.w900.bg }}"
-text = "{{ primary.w900.fg }}"
+base = "{{ primary.w800.bg }}"
+text = "{{ primary.w800.fg }}"
 
 [appearance.secondary_color]
-base = "{{ secondary.w400.bg }}"
-text = "{{ secondary.w400.fg }}"
+base = "{{ secondary.w800.bg }}"
+text = "{{ secondary.w800.fg }}"

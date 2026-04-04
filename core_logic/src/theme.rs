@@ -3,12 +3,12 @@ use palette::{IntoColor, Oklch, Srgb, color_difference::Wcag21RelativeContrast};
 use crate::data::{PaletteColor, PaletteColorVariant};
 
 pub fn generate_palette(hue: f32) -> PaletteColor {
-    generate_palette_with_base_chroma(hue, 0.15)
+    generate_palette_with_base_chroma(hue, 0.20)
 }
 
 pub fn generate_palette_with_base_chroma(hue: f32, base_chroma: f32) -> PaletteColor {
-    let w50 = Oklch::new(0.98, base_chroma * 0.05, hue);
-    let w100 = Oklch::new(0.95, base_chroma * 0.10, hue);
+    let w50 = Oklch::new(0.98, base_chroma * 0.10, hue);
+    let w100 = Oklch::new(0.92, base_chroma * 0.18, hue);
     let w200 = Oklch::new(0.88, base_chroma * 0.25, hue);
     let w300 = Oklch::new(0.80, base_chroma * 0.50, hue);
     let w400 = Oklch::new(0.70, base_chroma * 0.85, hue);
@@ -16,8 +16,8 @@ pub fn generate_palette_with_base_chroma(hue: f32, base_chroma: f32) -> PaletteC
     let w600 = Oklch::new(0.50, base_chroma * 0.95, hue);
     let w700 = Oklch::new(0.40, base_chroma * 0.80, hue);
     let w800 = Oklch::new(0.30, base_chroma * 0.55, hue);
-    let w900 = Oklch::new(0.20, base_chroma * 0.35, hue);
-    let w950 = Oklch::new(0.15, base_chroma * 0.20, hue);
+    let w900 = Oklch::new(0.20, base_chroma * 0.45, hue);
+    let w950 = Oklch::new(0.15, base_chroma * 0.30, hue);
 
     PaletteColor {
         w50: PaletteColorVariant {

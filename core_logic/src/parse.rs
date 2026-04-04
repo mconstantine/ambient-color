@@ -1,7 +1,7 @@
 use chrono::NaiveTime;
 use serde::Deserialize;
 
-use crate::ColorData;
+use crate::WeatherData;
 
 #[derive(Debug)]
 pub enum WttrParseError {
@@ -40,7 +40,7 @@ struct WttrResponse {
     daily_weather: Vec<DailyWeather>,
 }
 
-pub fn parse_wttr_data(data: &str) -> Result<ColorData, WttrParseError> {
+pub fn parse_wttr_data(data: &str) -> Result<WeatherData, WttrParseError> {
     let parsed: WttrResponse = serde_json::from_str(data).expect("Invalid JSON data");
 
     let current_condition = parsed
@@ -69,7 +69,7 @@ pub fn parse_wttr_data(data: &str) -> Result<ColorData, WttrParseError> {
     let sunrise_time = parse_time(&astronomy.sunrise)?;
     let sunset_time = parse_time(&astronomy.sunset)?;
 
-    Ok(ColorData {
+    Ok(WeatherData {
         max_temperature,
         min_temperature,
         temperature,

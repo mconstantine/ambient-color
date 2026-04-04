@@ -15,10 +15,6 @@ async fn main() {
             eprintln!("Parse error");
             std::process::exit(1);
         }
-        ColorResult::PaletteDataParseError => {
-            eprintln!("Error parsing palette data");
-            std::process::exit(1);
-        }
     }
 }
 

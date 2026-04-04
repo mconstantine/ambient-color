@@ -45,6 +45,5 @@ pub fn generate_theme_android() -> AndroidColorResult {
         },
         ColorResult::NetworkError => AndroidColorResult::NetworkError,
         ColorResult::ParseError => AndroidColorResult::ParseError,
-        ColorResult::PaletteDataParseError => AndroidColorResult::PaletteDataParseError,
     }
 }
