@@ -1,5 +1,9 @@
 use core_logic::{
-    ColorData, ColorResult, chrono::NaiveTime, compute_theme, data::Theme, generate_theme,
+    ColorResult,
+    chrono::NaiveTime,
+    compute_theme,
+    data::{Theme, WeatherData},
+    generate_theme,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -26,9 +30,6 @@ enum TSColorResult {
 
     #[serde(rename = "ParseError")]
     ParseError,
-
-    #[serde(rename = "PaletteDataParseError")]
-    PaletteDataParseError,
 
     #[serde(rename = "InvalidInput")]
     InvalidInput,
@@ -68,7 +69,7 @@ fn parse_and_compute(input: JsValue) -> Result<TSColorResult, TSColorResult> {
     let now = NaiveTime::parse_from_str(&data.now, "%H:%M:%S")
         .map_err(|_| TSColorResult::InvalidInput)?;
 
-    let color_data = ColorData {
+    let color_data = WeatherData {
         max_temperature: data.max_temperature,
         min_temperature: data.min_temperature,
         temperature: data.temperature,
@@ -86,6 +87,5 @@ fn parse_color_result(result: ColorResult) -> TSColorResult {
         ColorResult::Ok(data) => TSColorResult::Ok(data),
         ColorResult::NetworkError => TSColorResult::NetworkError,
         ColorResult::ParseError => TSColorResult::ParseError,
-        ColorResult::PaletteDataParseError => TSColorResult::PaletteDataParseError,
     }
 }
