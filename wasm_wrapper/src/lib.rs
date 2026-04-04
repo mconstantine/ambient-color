@@ -76,15 +76,12 @@ fn parse_and_compute(input: JsValue) -> Result<TSColorResult, TSColorResult> {
         sunset_time,
     };
 
-    let result = compute_theme(&color_data, data.day_of_year, now);
+    let theme = compute_theme(&color_data, data.day_of_year, now);
 
-    Ok(match result {
-        Ok(theme) => TSColorResult::Ok(theme),
-        Err(error) => parse_color_result(error),
-    })
+    Ok(TSColorResult::Ok(theme))
 }
 
-fn parse_color_result(result: ColorResult<Theme>) -> TSColorResult {
+fn parse_color_result(result: ColorResult) -> TSColorResult {
     match result {
         ColorResult::Ok(data) => TSColorResult::Ok(data),
         ColorResult::NetworkError => TSColorResult::NetworkError,

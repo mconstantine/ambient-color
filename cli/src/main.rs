@@ -1,11 +1,11 @@
 use std::fs;
 
-use core_logic::{ColorResult, data::ThemeExtended, generate_theme_extended, palette::Srgb};
+use core_logic::{ColorResult, data::Theme, generate_theme};
 use minijinja::{Environment, Value, context};
 
 #[tokio::main]
 async fn main() {
-    match generate_theme_extended().await {
+    match generate_theme().await {
         ColorResult::Ok(theme) => compile_config_files(theme),
         ColorResult::NetworkError => {
             eprintln!("Network error");
@@ -22,13 +22,13 @@ async fn main() {
     }
 }
 
-fn compile_config_files(theme: ThemeExtended) -> () {
+fn compile_config_files(theme: Theme) -> () {
     let mut env = Environment::new();
 
     env.add_filter("no_hashtag", no_hashtag);
 
     let context = context! {
-        original => srgb_as_hex(theme.original_color),
+        original => theme.original_color,
         primary => theme.primary_palette,
         opposite => theme.opposite_palette,
         secondary => theme.secondary_palette,
@@ -68,8 +68,4 @@ fn digest_template(
 
 fn no_hashtag(string: String) -> String {
     String::from(string.strip_prefix("#").unwrap())
-}
-
-fn srgb_as_hex(color: Srgb<u8>) -> String {
-    format!("#{:02X}{:02X}{:02X}", color.red, color.green, color.blue)
 }

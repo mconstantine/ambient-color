@@ -1,7 +1,37 @@
-use palette::Srgb;
-use serde::{Deserialize, Serialize};
+use palette::Oklch;
+use serde::Serialize;
 
-use crate::theme::PaletteColor;
+#[derive(Clone, Serialize)]
+pub struct PaletteColorVariant {
+    #[serde(with = "oklch_hex")]
+    pub bg: Oklch<f32>,
+
+    #[serde(with = "oklch_hex")]
+    pub fg: Oklch<f32>,
+}
+
+#[derive(Clone, Serialize)]
+pub struct PaletteColor {
+    pub w50: PaletteColorVariant,
+    pub w100: PaletteColorVariant,
+    pub w200: PaletteColorVariant,
+    pub w300: PaletteColorVariant,
+    pub w400: PaletteColorVariant,
+    pub w500: PaletteColorVariant,
+    pub w600: PaletteColorVariant,
+    pub w700: PaletteColorVariant,
+    pub w800: PaletteColorVariant,
+    pub w900: PaletteColorVariant,
+    pub w950: PaletteColorVariant,
+}
+impl PaletteColor {
+    pub fn variants(&self) -> [&PaletteColorVariant; 11] {
+        [
+            &self.w50, &self.w100, &self.w200, &self.w300, &self.w400, &self.w500, &self.w600,
+            &self.w700, &self.w800, &self.w900, &self.w950,
+        ]
+    }
+}
 
 #[derive(Serialize)]
 pub enum ForegroundType {
@@ -9,20 +39,9 @@ pub enum ForegroundType {
     Light,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct Theme {
-    #[serde(with = "srgb_hex")]
-    pub background_color: Srgb<u8>,
-
-    #[serde(with = "srgb_hex")]
-    pub foreground_color: Srgb<u8>,
-}
-
 #[derive(Serialize)]
-pub struct ThemeExtended {
-    #[serde(with = "srgb_hex")]
-    pub original_color: Srgb<u8>,
-    pub original_foreground_type: ForegroundType,
+pub struct Theme {
+    pub original_color: PaletteColorVariant,
     pub primary_palette: PaletteColor,
     pub opposite_palette: PaletteColor,
     pub secondary_palette: PaletteColor,
