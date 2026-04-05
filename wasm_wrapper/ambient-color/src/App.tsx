@@ -1,50 +1,50 @@
-import { type Accessor, createMemo, createResource, createSignal, type Component } from "solid-js";
-import { type DayOfYear, makeDayOfYear, type ComputeThemeInput } from "./wasm.schema";
-import { computeTheme } from "./wasm";
-import { ThemeDisplay } from "./ThemeDisplay";
-import { Controls } from "./Controls";
+import { createSignal, type Component } from "solid-js";
+import { Simulator } from "./Simulator";
+import { CurrentColor } from "./CurrentColor";
+
+type View = "simulator" | "current-color";
 
 const App: Component = () => {
-  const dayOfYearSignal = createSignal(getDayOfYear());
-  const [dayOfYear] = dayOfYearSignal;
+  const [currentView, setCurrentView] = createSignal<View>("current-color");
 
-  const input: Accessor<ComputeThemeInput> = createMemo(() => ({
-    now: new Date(),
-    day_of_year: dayOfYear(),
-    min_temperature: 0,
-    max_temperature: 0,
-    sunrise_time: new Date(),
-    sunset_time: new Date(),
-    temperature: 0,
-  }));
+  function switchView(view: View): void {
+    if (currentView() === view) return;
 
-  const [theme] = createResource(input, computeTheme);
+    setCurrentView(view);
+  }
 
   return (
     <div>
-      <Controls dayOfYearSignal={dayOfYearSignal} />
+      <nav class="navbar shadow-sm">
+        <ul class="menu menu-horizontal gap-2">
+          <li>
+            <button
+              class={currentView() === "simulator" ? "btn btn-neutral" : "btn"}
+              onclick={() => { switchView("simulator"); }}
+            >
+              Simulator
+            </button>
+          </li>
+          <li>
+            <button
+              class={currentView() === "current-color" ? "btn btn-neutral" : "btn"}
+              onclick={() => { switchView("current-color"); }}
+            >
+              Current color
+            </button>
+          </li>
+        </ul>
+      </nav>
       {(() => {
-        switch (theme.state) {
-          case "unresolved":
-          case "pending":
-          case "errored":
-            return null;
-          case "refreshing":
-          case "ready":
-            return <ThemeDisplay theme={theme()} />;
+        switch (currentView()) {
+          case "simulator":
+            return <Simulator />;
+          case "current-color":
+            return <CurrentColor />;
         }
       })()}
     </div>
   );
 };
-
-function getDayOfYear(): DayOfYear {
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const differenceMs = now.getTime() - startOfYear.getTime();
-  const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
-  return makeDayOfYear(Math.floor(differenceDays));
-}
 
 export default App;

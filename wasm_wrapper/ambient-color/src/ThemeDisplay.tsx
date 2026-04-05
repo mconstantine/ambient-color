@@ -1,25 +1,30 @@
 import type { Component } from "solid-js";
 import type { PaletteColor, PaletteColorVariant, Theme } from "./wasm.schema";
+import { ThemeData, type ThemeDataVariant } from "./ThemeData";
 
 type Props = {
   theme: Theme
+  variant: ThemeDataVariant
 };
 
 export const ThemeDisplay: Component<Props> = (props) => {
   return (
-    <div
-      class="p-4 min-h-[100vh]"
-      style={{
-        "background-color": props.theme.neutral_palette.w950.bg,
-        color: props.theme.primary_palette.w950.fg,
-      }}
-    >
-      <h2 class="text-xl mb-5">Generated theme</h2>
-      <PaletteColorDisplay palette={props.theme.primary_palette} name="Primary" />
-      <PaletteColorDisplay palette={props.theme.opposite_palette} name="Opposite" />
-      <PaletteColorDisplay palette={props.theme.secondary_palette} name="Secondary" />
-      <PaletteColorDisplay palette={props.theme.tertiary_palette} name="Tertiary" />
-      <PaletteColorDisplay palette={props.theme.neutral_palette} name="Neutral" />
+    <div>
+      <ThemeData theme={props.theme} variant={props.variant} />
+      <div
+        class="p-4 min-h-[100vh]"
+        style={{
+          "background-color": props.theme.neutral_palette.w950.bg,
+          color: props.theme.primary_palette.w950.fg,
+        }}
+      >
+        <h2 class="text-xl mb-5">Generated theme</h2>
+        <PaletteColorDisplay palette={props.theme.primary_palette} name="Primary" />
+        <PaletteColorDisplay palette={props.theme.opposite_palette} name="Opposite" />
+        <PaletteColorDisplay palette={props.theme.secondary_palette} name="Secondary" />
+        <PaletteColorDisplay palette={props.theme.tertiary_palette} name="Tertiary" />
+        <PaletteColorDisplay palette={props.theme.neutral_palette} name="Neutral" />
+      </div>
     </div>
   );
 };
@@ -55,7 +60,7 @@ type PaletteColorVariantDisplayProps = {
   variant: PaletteColorVariant
 };
 
-const PaletteColorVariantDisplay: Component<PaletteColorVariantDisplayProps> = (props) => {
+export const PaletteColorVariantDisplay: Component<PaletteColorVariantDisplayProps> = (props) => {
   return (
     <div
       class="w-[96px] h-[96px] p-2"

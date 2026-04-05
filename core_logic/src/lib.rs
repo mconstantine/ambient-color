@@ -1,9 +1,9 @@
 use chrono::{Datelike, Local, NaiveTime};
-use palette::{Hsl, IntoColor, Oklch, ShiftHue};
+use palette::{OklabHue, Oklch};
 
 use crate::{
-    color::{DailyTemperature, SolarTimes, get_hue, get_lightness, get_saturation},
-    data::{PaletteColorVariant, Theme, WeatherData},
+    color::{DailyTemperature, SolarTimes, get_chroma, get_hue, get_luma},
+    data::{ColorData, PaletteColorVariant, Theme, WeatherData},
     network::fetch_wttr_data,
     parse::{WttrParseError, parse_wttr_data},
     theme::{generate_palette, generate_palette_with_base_chroma, get_foreground_color},
@@ -74,16 +74,34 @@ pub async fn generate_theme() -> ColorResult {
 }
 
 pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTime) -> Theme {
-    let original_color_hsv = generate_color(data, day_of_year, time_of_day);
-    let original_color: Oklch = original_color_hsv.into_color();
-    let opposite_color = original_color_hsv.shift_hue(180.0);
-    let secondary_color = original_color_hsv.shift_hue(120.0);
-    let tertiary_color = original_color_hsv.shift_hue(240.0);
+    let hue = get_hue(day_of_year);
 
-    let primary_palette = generate_palette(original_color.hue.into_positive_degrees());
-    let opposite_palette = generate_palette(opposite_color.hue.into_positive_degrees());
-    let secondary_palette = generate_palette(secondary_color.hue.into_positive_degrees());
-    let tertiary_palette = generate_palette(tertiary_color.hue.into_positive_degrees());
+    let chroma = get_chroma(
+        DailyTemperature {
+            max: data.max_temperature,
+            min: data.min_temperature,
+        },
+        data.temperature,
+    );
+
+    let luma = get_luma(
+        SolarTimes {
+            sunrise: data.sunrise_time,
+            sunset: data.sunset_time,
+        },
+        time_of_day,
+    );
+
+    let original_color: Oklch = Oklch {
+        l: luma,
+        chroma,
+        hue: OklabHue::new(hue),
+    };
+
+    let primary_palette = generate_palette(hue);
+    let opposite_palette = generate_palette((hue + 180.0).rem_euclid(360.0));
+    let secondary_palette = generate_palette((hue + 120.0).rem_euclid(360.0));
+    let tertiary_palette = generate_palette((hue + 240.0).rem_euclid(360.0));
 
     let neutral_palette =
         generate_palette_with_base_chroma(original_color.hue.into_positive_degrees(), 0.01);
@@ -95,7 +113,9 @@ pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTim
     );
 
     Theme {
+        day_of_year,
         weather_data: (*data).clone(),
+        color_data: ColorData { hue, chroma, luma },
         original_color: PaletteColorVariant {
             bg: original_color,
             fg: original_color_foreground,
@@ -106,26 +126,4 @@ pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTim
         tertiary_palette,
         neutral_palette,
     }
-}
-
-fn generate_color(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTime) -> Hsl {
-    let hue = get_hue(day_of_year);
-
-    let saturation = get_saturation(
-        DailyTemperature {
-            max: data.max_temperature,
-            min: data.min_temperature,
-        },
-        data.temperature,
-    );
-
-    let lightness = get_lightness(
-        SolarTimes {
-            sunrise: data.sunrise_time,
-            sunset: data.sunset_time,
-        },
-        time_of_day,
-    );
-
-    Hsl::new(hue, saturation, lightness)
 }

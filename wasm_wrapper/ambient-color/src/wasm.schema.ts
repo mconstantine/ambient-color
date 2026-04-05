@@ -62,14 +62,16 @@ export const DateFromSolarTime = Schema.transformOrFail(
 
       const now = new Date();
 
-      return ParseResult.succeed(new Date(Date.UTC(
+      const result = new Date(
         now.getUTCFullYear(),
         now.getUTCMonth(),
         now.getUTCDate(),
         hoursNum,
         minutesNum,
         secondsNum,
-      )));
+      );
+
+      return ParseResult.succeed(result);
     },
     encode: (to: Date) => ParseResult.succeed(to.toLocaleTimeString("it-IT", {
       hour: "2-digit",
@@ -114,6 +116,12 @@ const PaletteColor = Schema.Struct({
 });
 export type PaletteColor = typeof PaletteColor.Type;
 
+const ColorData = Schema.Struct({
+  hue: Schema.Number,
+  chroma: Schema.Number,
+  luma: Schema.Number,
+});
+
 const WeatherData = ComputeThemeInput.pipe(Schema.pick(
   "max_temperature",
   "min_temperature",
@@ -123,6 +131,8 @@ const WeatherData = ComputeThemeInput.pipe(Schema.pick(
 ));
 
 export const Theme = Schema.Struct({
+  day_of_year: DayOfYear,
+  color_data: ColorData,
   weather_data: WeatherData,
   original_color: PaletteColorVariant,
   primary_palette: PaletteColor,

@@ -3,6 +3,13 @@ use palette::Oklch;
 use serde::Serialize;
 
 #[derive(Serialize, Clone)]
+pub struct ColorData {
+    pub hue: f32,
+    pub chroma: f32,
+    pub luma: f32,
+}
+
+#[derive(Serialize, Clone)]
 pub struct WeatherData {
     pub max_temperature: i8,
     pub min_temperature: i8,
@@ -44,13 +51,9 @@ impl PaletteColor {
 }
 
 #[derive(Serialize)]
-pub enum ForegroundType {
-    Dark,
-    Light,
-}
-
-#[derive(Serialize)]
 pub struct Theme {
+    pub day_of_year: u32,
+    pub color_data: ColorData,
     pub weather_data: WeatherData,
     pub original_color: PaletteColorVariant,
     pub primary_palette: PaletteColor,

@@ -7,9 +7,10 @@ type Props = {
 
 export const Controls: Component<Props> = (props) => {
   const [dayOfYear, setDayOfYear] = props.dayOfYearSignal;
-  const now = new Date();
 
   const currentDate = createMemo(() => {
+    const now = new Date();
+
     return new Date(
       new Date(now.getFullYear(), 0, 1)
         .getTime() + 1000 * 60 * 60 * 24 * dayOfYear(),
