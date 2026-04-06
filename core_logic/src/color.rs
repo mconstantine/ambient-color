@@ -1,3 +1,4 @@
+use crate::data::Time;
 use chrono::{NaiveTime, TimeDelta, Timelike};
 
 pub fn get_hue(day_of_year: u32) -> f32 {
@@ -33,7 +34,7 @@ pub struct SolarTimes {
     pub sunset: NaiveTime,
 }
 
-pub fn get_luma(solar_times: SolarTimes, now: NaiveTime) -> f32 {
+pub fn get_luma(solar_times: SolarTimes, now: NaiveTime) -> (f32, Time) {
     let one_hour_before_sunrise = solar_times.sunrise - TimeDelta::hours(1);
     let one_hour_after_sunrise = solar_times.sunrise + TimeDelta::hours(1);
     let one_hour_before_sunset = solar_times.sunset - TimeDelta::hours(1);
@@ -43,13 +44,17 @@ pub fn get_luma(solar_times: SolarTimes, now: NaiveTime) -> f32 {
     let max_luma = 0.98;
 
     if now < one_hour_before_sunrise || now > one_hour_after_sunset {
-        // night
-        min_luma
+        (min_luma, Time::Night)
     } else if now > one_hour_after_sunrise && now < one_hour_before_sunset {
-        // day
-        max_luma
+        (max_luma, Time::Day)
     } else {
         let is_afternoon = now >= one_hour_before_sunset;
+
+        let time = if is_afternoon {
+            Time::Sunset
+        } else {
+            Time::Sunrise
+        };
 
         let min = if is_afternoon {
             one_hour_before_sunset
@@ -72,6 +77,6 @@ pub fn get_luma(solar_times: SolarTimes, now: NaiveTime) -> f32 {
         let ratio = reference as f32 / range as f32;
         let adjusted_ratio = if is_afternoon { 1.0 - ratio } else { ratio };
 
-        min_luma + (adjusted_ratio * (max_luma - min_luma))
+        (min_luma + (adjusted_ratio * (max_luma - min_luma)), time)
     }
 }

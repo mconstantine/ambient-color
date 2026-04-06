@@ -1,12 +1,13 @@
-use std::fs;
+use std::{fs, path::Path};
 
 use core_logic::{ColorResult, data::Theme, generate_theme};
+use directories::ProjectDirs;
 use minijinja::{Environment, Value, context};
 
 #[tokio::main]
 async fn main() {
-    match generate_theme().await {
-        ColorResult::Ok(theme) => compile_config_files(theme),
+    let theme = match generate_theme().await {
+        ColorResult::Ok(theme) => theme,
         ColorResult::NetworkError => {
             eprintln!("Network error");
             std::process::exit(1);
@@ -15,10 +16,12 @@ async fn main() {
             eprintln!("Parse error");
             std::process::exit(1);
         }
-    }
+    };
+
+    compile_config_files(&theme);
 }
 
-fn compile_config_files(theme: Theme) -> () {
+fn compile_config_files(theme: &Theme) -> () {
     let mut env = Environment::new();
 
     env.add_filter("no_hashtag", no_hashtag);
@@ -32,33 +35,66 @@ fn compile_config_files(theme: Theme) -> () {
         neutral => theme.neutral_palette,
     };
 
-    digest_template(&context, &mut env, "ashell", "ashell.toml");
-    digest_template(&context, &mut env, "clipse", "clipse_theme.json");
-    digest_template(&context, &mut env, "nvim", "colors.lua");
-    digest_template(&context, &mut env, "fnott", "fnott.ini");
-    digest_template(&context, &mut env, "foot", "foot.ini");
-    digest_template(&context, &mut env, "gtk", "gtk.css");
-    digest_template(&context, &mut env, "hyprland", "hyprland.conf");
-    digest_template(&context, &mut env, "hyprlock", "hyprlock.conf");
-    digest_template(&context, &mut env, "rofi", "rofi.rasi");
-    digest_template(&context, &mut env, "tmux", "tmux.conf");
-    digest_template(&context, &mut env, "zsh", ".zshrc");
+    if let Some(project_dirs) = ProjectDirs::from("it", "mconst", "ambient-color") {
+        let config_dir = project_dirs.config_dir();
+        let cache_dir = project_dirs.cache_dir();
+        let templates_dir = config_dir.join("templates");
+
+        if let Err(error) = fs::create_dir_all(cache_dir) {
+            eprintln!("Failed to create cache directory: {}", error);
+            return;
+        }
+
+        let dirs: Directories = Directories {
+            source: &templates_dir,
+            destination: cache_dir,
+        };
+
+        digest_template(&dirs, &context, &mut env, "ashell", "ashell.toml");
+        digest_template(&dirs, &context, &mut env, "clipse", "clipse_theme.json");
+        digest_template(&dirs, &context, &mut env, "nvim", "colors.lua");
+        digest_template(&dirs, &context, &mut env, "fnott", "fnott.ini");
+        digest_template(&dirs, &context, &mut env, "foot", "foot.ini");
+        digest_template(&dirs, &context, &mut env, "gtk", "gtk.css");
+        digest_template(&dirs, &context, &mut env, "hyprland", "hyprland.conf");
+        digest_template(&dirs, &context, &mut env, "hyprlock", "hyprlock.conf");
+        digest_template(&dirs, &context, &mut env, "rofi", "rofi.rasi");
+        digest_template(&dirs, &context, &mut env, "tmux", "tmux.conf");
+        digest_template(&dirs, &context, &mut env, "zsh", ".zshrc");
+
+        match serde_json::to_string(theme) {
+            Ok(json) => {
+                if let Err(error) = fs::write(cache_dir.join("data.json"), json) {
+                    eprintln!("Unable to write data into cache: {}", error);
+                }
+            }
+            Err(error) => eprintln!("Failed to serialize data: {}", error),
+        }
+    } else {
+        eprintln!("Unable to access project directories");
+    }
 }
 
-fn digest_template(
+struct Directories<'a> {
+    source: &'a Path,
+    destination: &'a Path,
+}
+
+fn digest_template<'a>(
+    directories: &Directories<'a>,
     context: &Value,
     env: &mut Environment,
     template_name: &str,
     file_path: &str,
 ) -> () {
-    let template = fs::read_to_string(format!("./templates/{}", file_path))
+    let template = fs::read_to_string(directories.source.join(file_path))
         .expect(format!("{} template not found", template_name).as_str());
 
     let rendered = env
         .render_str(&template, context)
         .expect(format!("Unable to render {} template", template_name).as_str());
 
-    fs::write(format!("./rendered_templates/{}", file_path), rendered)
+    fs::write(directories.destination.join(file_path), rendered)
         .expect(format!("Unable to save rendered {} template", template_name).as_str());
 }
 

@@ -2,7 +2,7 @@ use core_logic::{
     ColorResult,
     chrono::NaiveTime,
     compute_theme,
-    data::{Theme, WeatherData},
+    data::{MoonPhase, Theme, WeatherCondition, WeatherData},
     generate_theme,
 };
 use serde::{Deserialize, Serialize};
@@ -70,11 +70,13 @@ fn parse_and_compute(input: JsValue) -> Result<TSColorResult, TSColorResult> {
         .map_err(|_| TSColorResult::InvalidInput)?;
 
     let color_data = WeatherData {
+        weather_condition: WeatherCondition::Unknown(String::from("WASM")),
         max_temperature: data.max_temperature,
         min_temperature: data.min_temperature,
         temperature: data.temperature,
         sunrise_time,
         sunset_time,
+        moon_phase: MoonPhase::Unknown(String::from("WASM")),
     };
 
     let theme = compute_theme(&color_data, data.day_of_year, now);

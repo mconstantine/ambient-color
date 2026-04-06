@@ -84,7 +84,7 @@ pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTim
         data.temperature,
     );
 
-    let luma = get_luma(
+    let (luma, time) = get_luma(
         SolarTimes {
             sunrise: data.sunrise_time,
             sunset: data.sunset_time,
@@ -113,6 +113,7 @@ pub fn compute_theme(data: &WeatherData, day_of_year: u32, time_of_day: NaiveTim
     );
 
     Theme {
+        time,
         day_of_year,
         weather_data: (*data).clone(),
         color_data: ColorData { hue, chroma, luma },

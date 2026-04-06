@@ -1,7 +1,10 @@
 use chrono::NaiveTime;
 use serde::Deserialize;
 
-use crate::WeatherData;
+use crate::{
+    WeatherData,
+    data::{MoonPhase, WeatherCondition},
+};
 
 #[derive(Debug)]
 pub enum WttrParseError {
@@ -16,12 +19,16 @@ pub enum WttrParseError {
 struct CurrentCondition {
     #[serde(rename = "temp_C")]
     temperature: String,
+
+    #[serde(rename = "weatherCode")]
+    weather_code: String,
 }
 
 #[derive(Deserialize)]
 struct Astronomy {
     sunrise: String,
     sunset: String,
+    moon_phase: String,
 }
 
 #[derive(Deserialize)]
@@ -68,13 +75,17 @@ pub fn parse_wttr_data(data: &str) -> Result<WeatherData, WttrParseError> {
     let temperature = parse_temperature(&current_condition.temperature)?;
     let sunrise_time = parse_time(&astronomy.sunrise)?;
     let sunset_time = parse_time(&astronomy.sunset)?;
+    let weather_condition = parse_weather_code(&current_condition.weather_code);
+    let moon_phase = parse_moon_phase(&astronomy.moon_phase);
 
     Ok(WeatherData {
+        weather_condition,
         max_temperature,
         min_temperature,
         temperature,
         sunrise_time,
         sunset_time,
+        moon_phase,
     })
 }
 
@@ -98,6 +109,75 @@ fn parse_time(time: &str) -> Result<NaiveTime, WttrParseError> {
     NaiveTime::parse_from_str(time, "%I:%M %p").map_err(|_err| WttrParseError::ParseTime {
         received: String::from(time),
     })
+}
+
+fn parse_weather_code(weather_code: &str) -> WeatherCondition {
+    // source: https://www.worldweatheronline.com/feed/wwoConditionCodes.txt
+    match weather_code {
+        "113" => WeatherCondition::Sunny,
+        "122" => WeatherCondition::Cloudy,
+        "119" => WeatherCondition::Cloudy,
+        "116" => WeatherCondition::Cloudy,
+        "260" => WeatherCondition::Fog,
+        "248" => WeatherCondition::Fog,
+        "143" => WeatherCondition::Fog,
+        "389" => WeatherCondition::Rain,
+        "386" => WeatherCondition::Rain,
+        "359" => WeatherCondition::Rain,
+        "356" => WeatherCondition::Rain,
+        "353" => WeatherCondition::Rain,
+        "314" => WeatherCondition::Rain,
+        "311" => WeatherCondition::Rain,
+        "308" => WeatherCondition::Rain,
+        "35" => WeatherCondition::Rain,
+        "302" => WeatherCondition::Rain,
+        "299" => WeatherCondition::Rain,
+        "296" => WeatherCondition::Rain,
+        "293" => WeatherCondition::Rain,
+        "284" => WeatherCondition::Rain,
+        "281" => WeatherCondition::Rain,
+        "266" => WeatherCondition::Rain,
+        "263" => WeatherCondition::Rain,
+        "377" => WeatherCondition::Rain,
+        "374" => WeatherCondition::Rain,
+        "350" => WeatherCondition::Rain,
+        "200" => WeatherCondition::Rain,
+        "185" => WeatherCondition::Rain,
+        "176" => WeatherCondition::Rain,
+        "395" => WeatherCondition::Snow,
+        "392" => WeatherCondition::Snow,
+        "371" => WeatherCondition::Snow,
+        "368" => WeatherCondition::Snow,
+        "365" => WeatherCondition::Snow,
+        "362" => WeatherCondition::Snow,
+        "338" => WeatherCondition::Snow,
+        "335" => WeatherCondition::Snow,
+        "332" => WeatherCondition::Snow,
+        "329" => WeatherCondition::Snow,
+        "326" => WeatherCondition::Snow,
+        "323" => WeatherCondition::Snow,
+        "320" => WeatherCondition::Snow,
+        "317" => WeatherCondition::Snow,
+        "230" => WeatherCondition::Snow,
+        "227" => WeatherCondition::Snow,
+        "182" => WeatherCondition::Snow,
+        "179" => WeatherCondition::Snow,
+        _ => WeatherCondition::Unknown(String::from(weather_code)),
+    }
+}
+
+fn parse_moon_phase(moon_phase: &str) -> MoonPhase {
+    match moon_phase {
+        "New Moon" => MoonPhase::NewMoon,
+        "Waxing Crescent" => MoonPhase::WaxingCrescent,
+        "First Quarter" => MoonPhase::FirstQuarter,
+        "Waxing Gibbous" => MoonPhase::WaxingGibbous,
+        "Full Moon" => MoonPhase::FullMoon,
+        "Waning Gibbous" => MoonPhase::WaningGibbous,
+        "Last Quarter" => MoonPhase::LastQuarter,
+        "Waning Crescent" => MoonPhase::WaningCrescent,
+        _ => MoonPhase::Unknown(String::from(moon_phase)),
+    }
 }
 
 #[cfg(test)]

@@ -10,12 +10,68 @@ pub struct ColorData {
 }
 
 #[derive(Serialize, Clone)]
+#[serde(into = "String")]
+pub enum WeatherCondition {
+    Sunny,
+    Cloudy,
+    Fog,
+    Rain,
+    Snow,
+    Unknown(String),
+}
+
+impl Into<String> for WeatherCondition {
+    fn into(self) -> String {
+        match self {
+            WeatherCondition::Sunny => String::from("Sunny"),
+            WeatherCondition::Cloudy => String::from("Cloudy"),
+            WeatherCondition::Fog => String::from("Fog"),
+            WeatherCondition::Rain => String::from("Rain"),
+            WeatherCondition::Snow => String::from("Snow"),
+            WeatherCondition::Unknown(code) => code,
+        }
+    }
+}
+
+#[derive(Serialize, Clone)]
+#[serde(into = "String")]
+pub enum MoonPhase {
+    NewMoon,
+    WaxingCrescent,
+    FirstQuarter,
+    WaxingGibbous,
+    FullMoon,
+    WaningGibbous,
+    LastQuarter,
+    WaningCrescent,
+    Unknown(String),
+}
+
+impl Into<String> for MoonPhase {
+    fn into(self) -> String {
+        match self {
+            MoonPhase::NewMoon => String::from("NewMoon"),
+            MoonPhase::WaxingCrescent => String::from("WaxingCrescent"),
+            MoonPhase::FirstQuarter => String::from("FirstQuarter"),
+            MoonPhase::WaxingGibbous => String::from("WaxingGibbous"),
+            MoonPhase::FullMoon => String::from("FullMoon"),
+            MoonPhase::WaningGibbous => String::from("WaningGibbous"),
+            MoonPhase::LastQuarter => String::from("LastQuarter"),
+            MoonPhase::WaningCrescent => String::from("WaningCrescent"),
+            MoonPhase::Unknown(moon_phase) => moon_phase,
+        }
+    }
+}
+
+#[derive(Serialize, Clone)]
 pub struct WeatherData {
     pub max_temperature: i8,
     pub min_temperature: i8,
     pub temperature: i8,
     pub sunrise_time: NaiveTime,
     pub sunset_time: NaiveTime,
+    pub weather_condition: WeatherCondition,
+    pub moon_phase: MoonPhase,
 }
 
 #[derive(Clone, Serialize)]
@@ -51,7 +107,16 @@ impl PaletteColor {
 }
 
 #[derive(Serialize)]
+pub enum Time {
+    Sunrise,
+    Day,
+    Sunset,
+    Night,
+}
+
+#[derive(Serialize)]
 pub struct Theme {
+    pub time: Time,
     pub day_of_year: u32,
     pub color_data: ColorData,
     pub weather_data: WeatherData,

@@ -2,4 +2,3 @@ target/
 android_src/
 jniLibs/
 node_modules/
-rendered_templates/
