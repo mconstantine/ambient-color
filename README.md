@@ -19,25 +19,50 @@ rustup target add x86_64-linux-android
 
 ## CLI
 
-Test the CLI command:
+Build the CLI package and symlink it, and the script, to a place where they can run:
 
 ```bash
 cargo build --release --bin cli
-./ambient.sh
+ln -s ./target/release/cli ~/.local/bin
+ln -s ./ambient.sh ~/.local/bin
+```
+
+Link the daemon:
+
+```bash
+ln -s ./ambient-color.service ~/.config/systemd/user
+ln -s ./ambient-color.timer ~/.config/systemd/user
+```
+
+Start the service:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now ambient-color.timer
+```
+
+Manual run:
+
+```bash
+ambient.sh
 ```
 
 ## WASM
 
-Test the WASM wrapper:
+Build the WASM wrapper:
 
 ```bash
 cd wasm_wrapper
 
 # Builds the WASM wrapper from Rust code
 wasm-pack build --target web
+```
 
-# Runs a simple web server on port 8000 to test index.html
-python3 -m http.server
+Run the simulator:
+
+```bash
+cd wasm_wrapper/ambient-color
+npm start
 ```
 
 ## Android
