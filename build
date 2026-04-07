@@ -8,7 +8,6 @@ fi
 
 if [[ "$1" == "cli" ]]; then
   cargo build --release --bin cli
-  ./ambient.sh
 fi
 
 if [[ "$1" == "wasm" ]]; then
