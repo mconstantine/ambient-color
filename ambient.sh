@@ -8,6 +8,7 @@ sunset=$(echo "$data" | jq -r '.weather_data.sunset_time')
 
 sunrise_sec=$(date -d "$sunrise" +%s)
 sunset_sec=$(date -d "$sunset" +%s)
+time=$(echo "$data" | jq -r '.time')
 now_sec=$(date +%s)
 
 one_hour_before_sunrise=$(( sunrise_sec - 3600 ))
@@ -15,7 +16,13 @@ one_hour_after_sunrise=$(( sunrise_sec + 3600 ))
 one_hour_before_sunset=$(( sunset_sec - 3600 ))
 one_hour_after_sunset=$(( sunset_sec + 3600 ))
 
-delay_sec=1200
+case "$time" in
+  "Sunrise") delay_sec=300;;
+  "Day") delay_sec=1200;;
+  "Sunset") delay_sec=300;;
+  "Night") delay_sec=1200;;
+  *) delay_sec=1200;;
+esac
 
 check_event() {
   local event_time=$1
