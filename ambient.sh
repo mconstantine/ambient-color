@@ -1,19 +1,7 @@
 #!/bin/bash
 
 ambient-color
-
-data=$(cat ~/.cache/ambient-color/data.json)
-time=$(echo "$data" | jq -r '.time')
-
-if [[ "$time" == "Sunrise" ]]; then
-  dark
-elif [[ "$time" == "Day" ]]; then
-  light
-elif [[ "$time" == "Sunset" ]]; then
-  dark
-elif [[ "$time" == "Night" ]]; then
-  night
-fi
+theme.sh
 
 sunrise=$(echo "$data" | jq -r '.weather_data.sunrise_time')
 sunset=$(echo "$data" | jq -r '.weather_data.sunset_time')
