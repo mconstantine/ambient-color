@@ -1,4 +1,4 @@
-if ! pgrep -x "Hyprland" > /dev/null; then
+if pgrep -x "Hyprland" > /dev/null; then
   data=$(cat ~/.cache/ambient-color/data.json)
   time=$(echo "$data" | jq -r '.time')
 
