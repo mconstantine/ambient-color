@@ -32,4 +32,5 @@ android {
 }
 
 dependencies {
+    implementation("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0")
 }
