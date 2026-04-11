@@ -5,7 +5,7 @@ import { CurrentColor } from "./CurrentColor";
 type View = "simulator" | "current-color";
 
 const App: Component = () => {
-  const [currentView, setCurrentView] = createSignal<View>("current-color");
+  const [currentView, setCurrentView] = createSignal<View>("simulator");
 
   function switchView(view: View): void {
     if (currentView() === view) return;
