@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{env, fs, path::Path};
 
 use core_logic::{ColorResult, data::Theme, generate_theme};
 use directories::ProjectDirs;
@@ -6,16 +6,27 @@ use minijinja::{Environment, Value, context};
 
 #[tokio::main]
 async fn main() {
-    let theme = match generate_theme().await {
-        ColorResult::Ok(theme) => theme,
-        ColorResult::NetworkError => {
-            eprintln!("Network error");
-            std::process::exit(1);
-        }
-        ColorResult::ParseError => {
-            eprintln!("Parse error");
-            std::process::exit(1);
-        }
+    let args: Vec<String> = env::args().collect();
+
+    let theme = match args.get(1).map(|s| s.as_str()) {
+        Some("compile") => match read_cache() {
+            Ok(theme) => theme,
+            Err(error) => {
+                eprintln!("{}", error);
+                std::process::exit(1);
+            }
+        },
+        _ => match generate_theme().await {
+            ColorResult::Ok(theme) => theme,
+            ColorResult::NetworkError => {
+                eprintln!("Network error");
+                std::process::exit(1);
+            }
+            ColorResult::ParseError => {
+                eprintln!("Parse error");
+                std::process::exit(1);
+            }
+        },
     };
 
     compile_config_files(&theme);
@@ -100,4 +111,19 @@ fn digest_template<'a>(
 
 fn no_hashtag(string: String) -> String {
     String::from(string.strip_prefix("#").unwrap())
+}
+
+fn read_cache() -> Result<Theme, String> {
+    let project_dirs = ProjectDirs::from("it", "mconst", "ambient-color")
+        .ok_or(format!("Unable to access project directories"))?;
+
+    let cache_dir = project_dirs.cache_dir();
+
+    let content_string = fs::read_to_string(cache_dir.join("data.json"))
+        .map_err(|error| format!("Unable to read cache file: {}", error))?;
+
+    let theme = serde_json::from_str::<Theme>(&content_string)
+        .map_err(|error| format!("Unable to parse cached data into theme: {}", error))?;
+
+    Ok(theme)
 }

@@ -1,15 +1,15 @@
 use chrono::NaiveTime;
 use palette::Oklch;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ColorData {
     pub hue: f32,
     pub chroma: f32,
     pub luma: f32,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(into = "String")]
 pub enum WeatherCondition {
     Sunny,
@@ -33,7 +33,7 @@ impl Into<String> for WeatherCondition {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(into = "String")]
 pub enum MoonPhase {
     NewMoon,
@@ -63,7 +63,7 @@ impl Into<String> for MoonPhase {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct WeatherData {
     pub max_temperature: i8,
     pub min_temperature: i8,
@@ -74,7 +74,7 @@ pub struct WeatherData {
     pub moon_phase: MoonPhase,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PaletteColorVariant {
     #[serde(with = "oklch_hex")]
     pub bg: Oklch<f32>,
@@ -83,7 +83,7 @@ pub struct PaletteColorVariant {
     pub fg: Oklch<f32>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PaletteColor {
     pub w50: PaletteColorVariant,
     pub w100: PaletteColorVariant,
@@ -106,7 +106,7 @@ impl PaletteColor {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum Time {
     Sunrise,
     Day,
@@ -114,7 +114,7 @@ pub enum Time {
     Night,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Theme {
     pub time: Time,
     pub day_of_year: u32,
@@ -153,7 +153,7 @@ pub mod srgb_hex {
 
 pub mod oklch_hex {
     use palette::{IntoColor, Oklch, Srgb};
-    use serde::Serializer;
+    use serde::{Deserialize, Deserializer, Serializer, de::Error};
 
     pub fn serialize<S>(color: &Oklch<f32>, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -164,5 +164,29 @@ pub mod oklch_hex {
         let hex = format!("#{:02X}{:02X}{:02X}", result.red, result.green, result.blue);
 
         serializer.serialize_str(&hex)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Oklch<f32>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        let hex = s.trim_start_matches('#');
+
+        if hex.len() != 6 {
+            return Err(D::Error::custom(format!(
+                "Expected a 6-characters hex color, found {}",
+                s
+            )));
+        }
+
+        let r = u8::from_str_radix(&hex[0..2], 16).map_err(D::Error::custom)?;
+        let g = u8::from_str_radix(&hex[2..4], 16).map_err(D::Error::custom)?;
+        let b = u8::from_str_radix(&hex[4..6], 16).map_err(D::Error::custom)?;
+
+        let srgb_u8 = Srgb::new(r, g, b);
+        let srgb_f32: Srgb<f32> = srgb_u8.into_format();
+
+        Ok(srgb_f32.into_color())
     }
 }

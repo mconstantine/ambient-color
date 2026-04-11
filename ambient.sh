@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ambient-color
+ambient-color "$@"
 
 sunrise=$(echo "$data" | jq -r '.weather_data.sunrise_time')
 sunset=$(echo "$data" | jq -r '.weather_data.sunset_time')
