@@ -14,6 +14,8 @@ update_theme() {
     elif [[ "$time" == "Night" ]]; then
       night
     fi
+
+    ambient-color draw
   fi
 }
 
