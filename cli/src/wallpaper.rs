@@ -1,15 +1,48 @@
-use std::{cmp::min, process::Command};
+use std::process::{Command, Stdio};
 
 use core_logic::{
     data::Theme,
     palette::{IntoColor, Srgb},
 };
+use serde::Deserialize;
 use tiny_skia::{Color, Paint, PathBuilder, Pixmap, Transform};
 
+#[derive(Deserialize, Debug)]
+struct Monitor {
+    name: String,
+    width: u16,
+    height: u16,
+}
+
 pub fn draw_wallpaper(theme: &Theme) -> () {
-    let width = 2560;
-    let height = 1600;
-    let path = "/tmp/ambient_color_wallpaper.png";
+    // todo: check that Hyprland is running
+    // maybe this should be called by `theme.sh`
+    let monitors_output = Command::new("hyprctl")
+        .args(["monitors", "-j"])
+        .stdout(Stdio::piped())
+        .output()
+        .expect("Error: unable to read monitors");
+
+    let monitors_string = String::from_utf8(monitors_output.stdout)
+        .expect("Error: unable to turn monitors output into string");
+
+    let monitors: Vec<Monitor> = serde_json::from_str(&monitors_string)
+        .expect("Error: unable to parse monitors output to JSON");
+
+    for monitor in monitors {
+        draw_monitor_wallpaper(&monitor, theme);
+    }
+
+    Command::new("hyprctl")
+        .args(["hyprpaper", "unload", "all"])
+        .output()
+        .expect("Error: failed to unload old wallpapers");
+}
+
+fn draw_monitor_wallpaper(monitor: &Monitor, theme: &Theme) {
+    let width = monitor.width as u32;
+    let height = monitor.height as u32;
+    let path = format!("/tmp/ambient_color_wallpaper_{}.png", monitor.name);
 
     let mut pixmap = Pixmap::new(width, height).expect("Error: unable to create canvas");
 
@@ -41,7 +74,7 @@ pub fn draw_wallpaper(theme: &Theme) -> () {
 
     let center_x = width as f32 / 2.0;
     let center_y = height as f32 / 2.0;
-    let radius = min(width, height) as f32 * 0.2;
+    let radius = 256.0;
     let mut path_builder = PathBuilder::new();
 
     path_builder.push_circle(center_x, center_y, radius);
@@ -108,23 +141,20 @@ pub fn draw_wallpaper(theme: &Theme) -> () {
     // pixmap.stroke_path(&hex_path, &paint, &stroke, Transform::identity(), None);
 
     pixmap
-        .save_png(path)
+        .save_png(&path)
         .expect("Error: unable to save wallpaper");
 
     Command::new("hyprctl")
-        .args(["hyprpaper", "preload", path])
+        .args(["hyprpaper", "preload", &path])
         .output()
         .expect("Error: unable to preload wallpaper");
 
     Command::new("hyprctl")
-        .args(["hyprpaper", "wallpaper", &format!(",{}", path)])
+        .args([
+            "hyprpaper",
+            "wallpaper",
+            &format!("{},{}", monitor.name, path),
+        ])
         .output()
         .expect("Error: failed to set wallpaper");
-
-    Command::new("hyprctl")
-        .args(["hyprpaper", "unload", "all"])
-        .output()
-        .expect("Error: failed to unload old wallpapers");
-
-    println!("Done drawing wallpaper");
 }

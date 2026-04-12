@@ -285,6 +285,7 @@ dependencies = [
  "core_logic",
  "directories",
  "minijinja",
+ "serde",
  "serde_json",
  "tiny-skia",
  "tokio",
