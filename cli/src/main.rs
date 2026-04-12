@@ -10,8 +10,9 @@ mod wallpaper;
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
+    let command = args.get(1).map(|s| s.as_str());
 
-    let theme = match args.get(1).map(|s| s.as_str()) {
+    let theme = match command {
         Some("compile") | Some("draw") => match read_cache() {
             Ok(theme) => theme,
             Err(error) => {
@@ -32,8 +33,15 @@ async fn main() {
         },
     };
 
-    compile_config_files(&theme);
-    draw_wallpaper(&theme);
+    match command {
+        Some("compile") | None => compile_config_files(&theme),
+        _ => (),
+    };
+
+    match command {
+        Some("draw") => draw_wallpaper(&theme),
+        _ => (),
+    };
 }
 
 fn read_cache() -> Result<Theme, String> {
