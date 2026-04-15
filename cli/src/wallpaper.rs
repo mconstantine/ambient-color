@@ -55,7 +55,7 @@ fn draw_monitor_wallpaper(monitor: &Monitor, theme: &Theme) {
 
     let mut pixmap = Pixmap::new(width, height).expect("Error: unable to create canvas");
 
-    let bg_srgb_f32: Srgb<f32> = theme.original_color.fg.into_color();
+    let bg_srgb_f32: Srgb<f32> = theme.primary_palette.w950.bg.into_color();
     let bg_srgb_u8: Srgb<u8> = bg_srgb_f32.into_format();
     let circle_srgb_f32: Srgb<f32> = theme.original_color.bg.into_color();
     let circle_srgb_u8: Srgb<u8> = circle_srgb_f32.into_format();
