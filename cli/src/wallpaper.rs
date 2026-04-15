@@ -55,7 +55,7 @@ fn draw_monitor_wallpaper(monitor: &Monitor, theme: &Theme) {
 
     let mut pixmap = Pixmap::new(width, height).expect("Error: unable to create canvas");
 
-    let bg_srgb_f32: Srgb<f32> = theme.neutral_palette.w900.bg.into_color();
+    let bg_srgb_f32: Srgb<f32> = theme.original_color.fg.into_color();
     let bg_srgb_u8: Srgb<u8> = bg_srgb_f32.into_format();
     let circle_srgb_f32: Srgb<f32> = theme.original_color.bg.into_color();
     let circle_srgb_u8: Srgb<u8> = circle_srgb_f32.into_format();
@@ -122,18 +122,9 @@ struct Branch {
 fn draw_tree(theme: &Theme, pixmap: &mut Pixmap, monitor: &Monitor) -> () {
     let tree_srgb_f32: Srgb<f32> = theme.original_color.fg.into_color();
     let tree_srgb_u8: Srgb<u8> = tree_srgb_f32.into_format();
-    let opposite_srgb_f32: Srgb<f32> = theme.original_color.bg.into_color();
-    let opposite_srgb_u8: Srgb<u8> = opposite_srgb_f32.into_format();
 
     let tree_color =
         Color::from_rgba8(tree_srgb_u8.red, tree_srgb_u8.green, tree_srgb_u8.blue, 255);
-
-    let opposite_color = Color::from_rgba8(
-        opposite_srgb_u8.red,
-        opposite_srgb_u8.green,
-        opposite_srgb_u8.blue,
-        255,
-    );
 
     let mut paint = Paint::default();
 
@@ -194,7 +185,6 @@ fn draw_tree(theme: &Theme, pixmap: &mut Pixmap, monitor: &Monitor) -> () {
         .expect("Error: unable to draw last path");
 
     stroke.line_cap = LineCap::Butt;
-    paint.set_color(opposite_color);
     pixmap.stroke_path(&path, &paint, &stroke, Transform::identity(), None);
 }
 
