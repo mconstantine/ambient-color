@@ -2,11 +2,14 @@
 
 ambient-color "$@"
 
+data=$(cat ~/.cache/ambient-color/data.json)
+
 sunrise=$(echo "$data" | jq -r '.weather_data.sunrise_time')
 sunset=$(echo "$data" | jq -r '.weather_data.sunset_time')
 
 sunrise_sec=$(date -d "$sunrise" +%s)
 sunset_sec=$(date -d "$sunset" +%s)
+
 time=$(echo "$data" | jq -r '.time')
 now_sec=$(date +%s)
 
