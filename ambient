@@ -28,7 +28,6 @@ esac
 
 check_event() {
   local event_time=$1
-  local event_name=$2
   local difference=$(( event_time - now_sec ))
 
   if [[ $difference -gt 0 ]] && [[ $difference -lt $delay_sec  ]]; then

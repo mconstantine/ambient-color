@@ -11,7 +11,7 @@ if [[ "$1" == "cli" ]]; then
 fi
 
 if [[ "$1" == "wasm" ]]; then
-  cd wasm_wrapper
+  cd wasm_wrapper || exit
   wasm-pack build --target web
   cd ..
 fi
