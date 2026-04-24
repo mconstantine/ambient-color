@@ -24,8 +24,8 @@ Build the CLI package and symlink it, and the script, to a place where they can 
 ```bash
 cargo build --release --bin cli
 ln -s ./target/release/cli ~/.local/bin
-ln -s ./theme.sh ~/.local/bin
-ln -s ./ambient.sh ~/.local/bin
+ln -s ./theme ~/.local/bin
+ln -s ./ambient ~/.local/bin
 ```
 
 Link the daemon:
@@ -45,7 +45,7 @@ systemctl --user enable --now ambient-color.timer
 Manual run:
 
 ```bash
-ambient.sh
+ambient
 ```
 
 ## WASM

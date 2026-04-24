@@ -3,4 +3,4 @@ Description=Start ambient color at boot
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/bin/ambient.sh
+ExecStart=%h/.local/bin/ambient

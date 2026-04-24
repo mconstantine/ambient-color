@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ambient-color "$@"
 
@@ -43,4 +43,4 @@ check_event "$one_hour_after_sunset" "one_hour_after_sunset"
 
 systemd-run --user --on-active="${delay_sec}s" \
   --timer-property=AccuracySec=1s \
-  ~/.local/bin/ambient.sh
+  ~/.local/bin/ambient
