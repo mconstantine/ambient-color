@@ -39,7 +39,6 @@ pub fn compile_config_files(theme: &Theme) -> () {
         digest_template(&dirs, &context, &mut env, "fnott", "fnott.ini");
         digest_template(&dirs, &context, &mut env, "foot", "foot.ini");
         digest_template(&dirs, &context, &mut env, "gtk", "gtk.css");
-        digest_template(&dirs, &context, &mut env, "hyprland", "hyprland.conf");
         digest_template(&dirs, &context, &mut env, "hyprlock", "hyprlock.conf");
         digest_template(&dirs, &context, &mut env, "rofi", "rofi.rasi");
         digest_template(&dirs, &context, &mut env, "tmux", "tmux.conf");
