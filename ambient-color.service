@@ -3,4 +3,6 @@ Description=Start ambient color at boot
 
 [Service]
 Type=oneshot
+ExecStartPre=/usr/bin/bash -c 'until ping -c 1 -W 2 wttr.in >/dev/null 2>&1; do sleep 5; done'
 ExecStart=%h/.local/bin/ambient
+TimeoutStartSec=60
