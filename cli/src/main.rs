@@ -2,8 +2,12 @@ use core_logic::{ColorResult, data::Theme, generate_theme};
 use directories::ProjectDirs;
 use std::{env, fs};
 
-use crate::{templates::compile_config_files, wallpaper::draw_wallpaper};
+use crate::{
+    home_assistant::update_home_assistant, templates::compile_config_files,
+    wallpaper::draw_wallpaper,
+};
 
+mod home_assistant;
 mod templates;
 mod wallpaper;
 
@@ -13,7 +17,7 @@ async fn main() {
     let command = args.get(1).map(|s| s.as_str());
 
     let theme = match command {
-        Some("compile") | Some("draw") => match read_cache() {
+        Some("compile") | Some("draw") | Some("ha") => match read_cache() {
             Ok(theme) => theme,
             Err(error) => {
                 eprintln!("{}", error);
@@ -34,12 +38,16 @@ async fn main() {
     };
 
     match command {
-        Some("compile") | None => compile_config_files(&theme),
-        _ => (),
-    };
-
-    match command {
+        Some("compile") => compile_config_files(&theme),
+        Some("ha") => update_home_assistant(&theme).await,
         Some("draw") => draw_wallpaper(&theme),
+        None => {
+            compile_config_files(&theme);
+
+            tokio::spawn(async move {
+                update_home_assistant(&theme).await;
+            });
+        }
         _ => (),
     };
 }
