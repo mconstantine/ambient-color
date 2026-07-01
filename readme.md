@@ -19,11 +19,15 @@ rustup target add x86_64-linux-android
 
 ## CLI
 
-Build the CLI package and symlink it, and the script, to a place where they can run:
+Install the `cli` package:
 
 ```bash
-cargo build --release --bin cli
-ln -s ./target/release/cli ~/.local/bin
+cargo install --bin cli --path ./cli --root ~/.local
+```
+
+Symlink the `theme` and `ambient` scripts:
+
+```bash
 ln -s ./theme ~/.local/bin
 ln -s ./ambient ~/.local/bin
 ```
@@ -42,11 +46,14 @@ systemctl --user daemon-reload
 systemctl --user enable --now ambient-color.timer
 ```
 
-Manual run:
+Manual runs:
 
-```bash
-ambient
-```
+- `ambient-color` gets the data, writes the cache, generates the color, compiles the templates, draws the desktop wallpapers and sends the color to Home Assistant
+- `ambient-color compile` compiles the templates from the cache
+- `ambient-color draw` draws the desktop wallpapers from the cache
+- `ambient-color ha` sends the color to Home Assitant from the cache
+- `ambient` does the same job as the `systemd` service: it calls `ambient-color` and sets the next timer, which in turn will call `ambient`
+- `theme` will set the theme from the cache, then wait for any change to the cache to update it
 
 ## WASM
 
