@@ -43,10 +43,7 @@ async fn main() {
         Some("draw") => draw_wallpaper(&theme),
         None => {
             compile_config_files(&theme);
-
-            tokio::spawn(async move {
-                update_home_assistant(&theme).await;
-            });
+            update_home_assistant(&theme).await;
         }
         _ => (),
     };
