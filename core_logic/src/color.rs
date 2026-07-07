@@ -41,7 +41,7 @@ pub fn get_luma(solar_times: SolarTimes, now: NaiveTime) -> (f32, Time) {
     let one_hour_after_sunset = solar_times.sunset + TimeDelta::hours(1);
 
     let min_luma = 0.15;
-    let max_luma = 0.98;
+    let max_luma = 0.75;
 
     if now < one_hour_before_sunrise || now > one_hour_after_sunset {
         (min_luma, Time::Night)
