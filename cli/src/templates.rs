@@ -44,6 +44,14 @@ pub fn compile_config_files(theme: &Theme) -> () {
         digest_template(&dirs, &context, &mut env, "tmux", "tmux.conf");
         digest_template(&dirs, &context, &mut env, "zsh", ".zshrc");
 
+        digest_template(
+            &dirs,
+            &context,
+            &mut env,
+            "visidata_theme.py",
+            "visidata_theme.py",
+        );
+
         match serde_json::to_string(theme) {
             Ok(json) => {
                 if let Err(error) = fs::write(cache_dir.join("data.json"), json) {
