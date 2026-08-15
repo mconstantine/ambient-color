@@ -1,0 +1,9 @@
+services:
+  ambient-color:
+    build:
+      context: .
+      target: dev
+    image: ambient-color
+    ports:
+      - "3000:3000"
+    container_name: ambient-color

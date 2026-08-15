@@ -1,0 +1,12 @@
+services:
+  ambient-color:
+    environment:
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/tmp/xdg
+    volumes:
+      - /vault/dev/.config/nvim:/root/.config/nvim:ro
+      - /home/mconst/.cache/ambient-color:/root/.cache/ambient-color:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}:/tmp/xdg/${WAYLAND_DISPLAY}:rw
+    shm_size: '2gb'
