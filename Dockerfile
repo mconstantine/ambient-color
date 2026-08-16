@@ -27,6 +27,6 @@ ENV PATH="/opt/nvim-linux-x86_64/bin:${PATH}"
 RUN curl -fsSL https://yazi-rs.github.io/builds/yazi-keyring.gpg | tee /usr/share/keyrings/yazi-keyring.gpg >/dev/null && \
   echo 'deb [signed-by=/usr/share/keyrings/yazi-keyring.gpg] https://yazi-rs.github.io/builds/ stable main' | tee /etc/apt/sources.list.d/yazi.list >/dev/null && \
   apt update && \
-  apt install -y yazi
+  apt install -y yazi wl-clipboard
 
 CMD ["bash", "-c", "while sleep 1000; do :; done"]
