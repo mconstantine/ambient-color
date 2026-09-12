@@ -9,7 +9,7 @@
 - [x] fnott (`~/.config/fnott/fnott.ini`)
 - [x] foot (`~/.config/foot/foot.ini`)
 - [x] gtk (`~/.config/gtk-4.0/gtk.css`)
-- [x] hyprland (`~/.config/hypr/hyprland.conf`)
+- [x] hyprland (via `colors.lua`, sourced by `~/.config/hypr/hyprland.lua`)
 - [x] hyprlock (`~/.config/hypr/hyprlock.conf`)
 - [x] nvim (`~/.config/nvim/lua/mconst/colors.lua`)
 - [x] rofi (`~/.config/rofi/config.rasi`)
