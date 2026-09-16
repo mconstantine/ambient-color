@@ -1,0 +1,15 @@
+services:
+  ambient-color:
+    build:
+      context: .
+    image: ambient-color
+    container_name: ambient-color
+    volumes:
+      - ./:/repo
+    working_dir: /repo
+    networks:
+      - caddy
+    command: bash -c 'while sleep 1000; do :; done'
+networks:
+  caddy:
+    external: true
