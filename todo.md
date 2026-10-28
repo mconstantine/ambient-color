@@ -32,8 +32,3 @@ One unit, one self-rescheduling timer, no `OnCalendar`. Every tick:
 
 - Split them so `homie` builds without `tiny-skia`, `hyprctl` and `keyring`
 - Moving the next tick computation from Bash to `core_logic` is now optional, since all hosts run the same script: still worth it to test it and to drop the `jq` dependency
-
-### Fixes
-
-- `parse.rs:146`: `"35"` looks like a typo for `"305"`
-- `WeatherCondition` and `MoonPhase` need a `try_from` to match `into = "String"`: the `Unknown` variants serialize to a bare string that doesn't deserialize, so `read_cache()` can't read back what it wrote

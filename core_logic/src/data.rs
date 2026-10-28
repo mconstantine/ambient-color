@@ -10,7 +10,7 @@ pub struct ColorData {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-#[serde(into = "String")]
+#[serde(into = "String", from = "String")]
 pub enum WeatherCondition {
     Sunny,
     Cloudy,
@@ -33,8 +33,21 @@ impl Into<String> for WeatherCondition {
     }
 }
 
+impl From<String> for WeatherCondition {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "Sunny" => WeatherCondition::Sunny,
+            "Cloudy" => WeatherCondition::Cloudy,
+            "Fog" => WeatherCondition::Fog,
+            "Rain" => WeatherCondition::Rain,
+            "Snow" => WeatherCondition::Snow,
+            _ => WeatherCondition::Unknown(value),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
-#[serde(into = "String")]
+#[serde(into = "String", from = "String")]
 pub enum MoonPhase {
     NewMoon,
     WaxingCrescent,
@@ -59,6 +72,22 @@ impl Into<String> for MoonPhase {
             MoonPhase::LastQuarter => String::from("LastQuarter"),
             MoonPhase::WaningCrescent => String::from("WaningCrescent"),
             MoonPhase::Unknown(moon_phase) => moon_phase,
+        }
+    }
+}
+
+impl From<String> for MoonPhase {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "NewMoon" => MoonPhase::NewMoon,
+            "WaxingCrescent" => MoonPhase::WaxingCrescent,
+            "FirstQuarter" => MoonPhase::FirstQuarter,
+            "WaxingGibbous" => MoonPhase::WaxingGibbous,
+            "FullMoon" => MoonPhase::FullMoon,
+            "WaningGibbous" => MoonPhase::WaningGibbous,
+            "LastQuarter" => MoonPhase::LastQuarter,
+            "WaningCrescent" => MoonPhase::WaningCrescent,
+            _ => MoonPhase::Unknown(value),
         }
     }
 }
@@ -188,5 +217,31 @@ pub mod oklch_hex {
         let srgb_f32: Srgb<f32> = srgb_u8.into_format();
 
         Ok(srgb_f32.into_color())
+    }
+}
+
+#[cfg(test)]
+mod test_data {
+    use super::*;
+
+    #[test]
+    fn test_weather_condition_round_trip() {
+        let json = serde_json::to_string(&WeatherCondition::Unknown(String::from("149"))).unwrap();
+        assert_eq!(json, "\"149\"");
+
+        let parsed: WeatherCondition = serde_json::from_str(&json).unwrap();
+        assert!(matches!(parsed, WeatherCondition::Unknown(code) if code == "149"));
+
+        let parsed: WeatherCondition = serde_json::from_str("\"Rain\"").unwrap();
+        assert!(matches!(parsed, WeatherCondition::Rain));
+    }
+
+    #[test]
+    fn test_moon_phase_round_trip() {
+        let parsed: MoonPhase = serde_json::from_str("\"WaningGibbous\"").unwrap();
+        assert!(matches!(parsed, MoonPhase::WaningGibbous));
+
+        let parsed: MoonPhase = serde_json::from_str("\"Blue Moon\"").unwrap();
+        assert!(matches!(parsed, MoonPhase::Unknown(phase) if phase == "Blue Moon"));
     }
 }
